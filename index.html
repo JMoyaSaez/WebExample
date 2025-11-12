@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WebExample — Presentación</title>
+  <meta name="description" content="Presentación de WebExample — ejemplo de sitio web por JMoyaSaez" />
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#94a3b8;
+      --accent:#7c3aed;
+      --glass: rgba(255,255,255,0.04);
+      --radius:12px;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#071021 0%, #07152a 40%, #071a33 100%);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      padding:32px;
+    }
+    .container{max-width:980px;margin:0 auto}
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:28px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:10px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),#4c1d95);
+      box-shadow:0 6px 18px rgba(124,58,237,0.18);
+      font-weight:700;
+      font-size:20px;
+    }
+    h1{font-size:28px;margin:0}
+    p.lead{color:var(--muted);margin:6px 0 0}
+    nav a{
+      color:var(--muted);
+      text-decoration:none;
+      margin-left:14px;
+      font-weight:600;
+      font-size:13px;
+    }
+    main{
+      display:grid;
+      grid-template-columns:1fr 360px;
+      gap:20px;
+      align-items:start;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .hero{
+      padding:28px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(124,58,237,0.08), var(--glass));
+      margin-bottom:16px;
+    }
+    .hero h2{margin:0 0 8px;font-size:22px}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
+    .feature{
+      background:rgba(255,255,255,0.02);
+      padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+    }
+    .meta{color:var(--muted);font-size:14px}
+    .right .meta small{display:block;margin-top:8px;color:var(--muted)}
+    footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+    .btn{
+      display:inline-block;padding:10px 14px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:600;
+      box-shadow:0 6px 18px rgba(124,58,237,0.18);
+    }
+    a.ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted);padding:8px 12px;border-radius:10px;text-decoration:none}
+    @media (max-width:960px){
+      main{grid-template-columns:1fr; padding-bottom:20px}
+      .right{order:2}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">W</div>
+        <div>
+          <h1>WebExample</h1>
+          <p class="lead">Ejemplo de presentación — creado por JMoyaSaez</p>
+        </div>
+      </div>
+      <nav>
+        <a href="#about">Acerca</a>
+        <a href="#features">Características</a>
+        <a href="#contact">Contacto</a>
+        <a class="ghost" href="https://github.com/JMoyaSaez/WebExample" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="card">
+        <div class="hero">
+          <h2>Bienvenido a WebExample</h2>
+          <p class="meta">Esta página es una plantilla simple y moderna para presentar tu proyecto. Fácil de editar y lista para publicar.</p>
+          <p style="margin-top:14px;">
+            <a class="btn" href="#about">Conocer más</a>
+          </p>
+        </div>
+
+        <article id="about" style="margin-top:6px;">
+          <h3>Acerca del proyecto</h3>
+          <p class="meta">WebExample es un repositorio de demostración pensado para mostrar una estructura mínima pero estética: una página de presentación, secciones de características y un pie de contacto.</p>
+
+          <h4 id="features" style="margin-top:16px;">Características</h4>
+          <div class="features" role="list">
+            <div class="feature" role="listitem">
+              <strong>Responsive</strong>
+              <div class="meta">Se adapta a móviles, tablet y escritorio.</div>
+            </div>
+            <div class="feature" role="listitem">
+              <strong>Fácil edición</strong>
+              <div class="meta">HTML y CSS inline para cambios rápidos.</div>
+            </div>
+            <div class="feature" role="listitem">
+              <strong>Ligero</strong>
+              <div class="meta">Sin frameworks externos por defecto.</div>
+            </div>
+            <div class="feature" role="listitem">
+              <strong>Listo para GitHub Pages</strong>
+              <div class="meta">Sólo sube index.html al branch principal.</div>
+            </div>
+          </div>
+        </article>
+
+        <article id="contact" style="margin-top:18px;">
+          <h4>Contacto</h4>
+          <p class="meta">Autor: JMoyaSaez — <a href="https://github.com/JMoyaSaez" target="_blank" style="color:var(--accent);text-decoration:none">github.com/JMoyaSaez</a></p>
+          <p class="meta" style="margin-top:8px">¿Quieres que lo suba al repositorio por ti? Pídeme que haga el commit y lo empuje.</p>
+        </article>
+      </section>
+
+      <aside class="card right">
+        <h3>Detalles rápidos</h3>
+        <p class="meta"><strong>Repositorio:</strong><br>JMoyaSaez/WebExample</p>
+        <p class="meta"><strong>Tecnologías:</strong><br>HTML, CSS</p>
+        <p class="meta"><small>Instrucciones:</small> Coloca este archivo como "index.html" en la raíz del repositorio para que GitHub Pages lo sirva automáticamente (si está habilitado).</p>
+        <div style="margin-top:14px;">
+          <a class="btn" href="https://github.com/JMoyaSaez/WebExample/new/main?filename=index.html" target="_blank" rel="noopener">Crear en GitHub</a>
+          <a style="margin-left:8px" class="ghost" href="https://github.com/JMoyaSaez/WebExample" target="_blank" rel="noopener">Ir al repo</a>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div>© <strong>WebExample</strong> — JMoyaSaez</div>
+      <div class="meta">Plantilla generada — lista para personalizar</div>
+    </footer>
+  </div>
+</body>
+</html>
