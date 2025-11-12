@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplos de Técnicas de Navegación en Interfaces Web</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1, h2 {
+            color: #007bff;
+        }
+        section {
+            margin-bottom: 50px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 10px;
+            display: block;
+            white-space: pre-wrap;
+            border-radius: 5px;
+        }
+        .demo {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        /* Estilos para ejemplos */
+        .menu-horizontal {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+        }
+        .menu-horizontal a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+            z-index: 1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .breadcrumbs {
+            padding: 10px;
+            background-color: #eee;
+        }
+        .sidebar {
+            float: left;
+            width: 20%;
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-right: 20px;
+        }
+        .content {
+            float: left;
+            width: 75%;
+        }
+        .pagination {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .hamburger {
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: inline-block;
+        }
+        .hamburger-menu {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 10px;
+        }
+        .search-bar {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .search-bar input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .contextual-link {
+            color: #007bff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplos de Técnicas de Navegación en Interfaces Web</h1>
+    <p>Esta página muestra ejemplos prácticos de las técnicas de navegación cubiertas en la Clase 2 de la Unidad 7. Cada sección incluye una definición breve, el código HTML/CSS/JS utilizado y una demostración interactiva. Usa estos ejemplos para enseñar a tus alumnos cómo implementar navegación efectiva en interfaces web.</p>
+
+<section id="menu-principal">
+    <h2>Técnica 1: Menú Principal</h2>
+    <p>Definición: Punto central de navegación que proporciona acceso directo a secciones clave. Formatos: Horizontal fijo, lateral, emergente. Buenas prácticas: Visible y consistente.</p>
+    <pre><code><div class="menu-horizontal">
+    <a href="#">Inicio</a>
+    <a href="#">Categorías</a>
+    <a href="#">Búsqueda</a>
+</div>
+        </code></pre>
+        <div class="demo">
+            <div class="menu-horizontal">
+                <a href="#">Inicio</a>
+                <a href="#">Categorías</a>
+                <a href="#">Búsqueda</a>
+            </div>
+        </div>
+    </section><section id="menus-secundarios">
+    <h2>Técnica 2: Menús Secundarios o Dropdowns</h2>
+    <p>Definición: Despliegues de subcategorías que se activan al interactuar. Tipos: Cascada, mega dropdown. Buenas prácticas: Accesibles en móvil, no profundos.</p>
+    <pre><code><div class="dropdown">
+    <button>Categorías</button>
+    <div class="dropdown-content">
+        <a href="#">Subcategoría 1</a>
+        <a href="#">Subcategoría 2</a>
+    </div>
+</div>
+        </code></pre>
+        <div class="demo">
+            <div class="dropdown">
+                <button>Categorías</button>
+                <div class="dropdown-content">
+                    <a href="#">Subcategoría 1</a>
+                    <a href="#">Subcategoría 2</a>
+                </div>
+            </div>
+        </div>
+    </section><section id="migas-de-pan">
+    <h2>Técnica 3: Migas de Pan (Breadcrumbs)</h2>
+    <p>Definición: Ruta jerárquica para orientación. Buenas prácticas: En sitios profundos, clicables.</p>
+    <pre><code><div class="breadcrumbs">
+    Inicio > Categoría > Producto Actual
+</div>
+        </code></pre>
+        <div class="demo">
+            <div class="breadcrumbs">
+                Inicio > Categoría > Producto Actual
+            </div>
+        </div>
+    </section><section id="navegacion-lateral">
+    <h2>Técnica 4: Navegación Lateral (Sidebar)</h2>
+    <p>Definición: Barra lateral para categorías relacionadas. Buenas prácticas: Colapsable, filtros.</p>
+    <pre><code><div class="sidebar">
+    <ul>
+        <li>Categoría 1</li>
+        <li>Categoría 2</li>
+    </ul>
+</div>
+<div class="content">Contenido Principal</div>
+        </code></pre>
+        <div class="demo" style="overflow: auto;">
+            <div class="sidebar">
+                <ul>
+                    <li>Categoría 1</li>
+                    <li>Categoría 2</li>
+                </ul>
+            </div>
+            <div class="content">Contenido Principal</div>
+        </div>
+    </section><section id="paginacion-scroll">
+    <h2>Técnica 5: Paginación y Scroll Infinito</h2>
+    <p>Definición: Manejar contenido extenso. Tipos: Paginación tradicional, scroll infinito, load more.</p>
+    <pre><code><div class="pagination">
+    <a href="#">1</a>
+    <a href="#">2</a>
+    <a href="#">3</a>
+</div>
+        </code></pre>
+        <div class="demo">
+            <div class="pagination">
+                <a href="#">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+            </div>
+        </div>
+    </section><section id="menu-hamburguesa">
+    <h2>Técnica 6: Menú de Hamburguesa (Móviles)</h2>
+    <p>Definición: Ícono ☰ para menús ocultos en móviles.</p>
+    <pre><code><script>
+function toggleMenu() {
+    var menu = document.getElementById("hamburger-menu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+</script>
+<div class="hamburger" onclick="toggleMenu()">☰</div>
+<div id="hamburger-menu" class="hamburger-menu">
+    <a href="#">Opción 1</a>
+    <a href="#">Opción 2</a>
+</div>
+        </code></pre>
+        <div class="demo">
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+            <div id="hamburger-menu" class="hamburger-menu" style="display: none;">
+                <a href="#">Opción 1</a>
+                <a href="#">Opción 2</a>
+            </div>
+        </div>
+    </section><section id="busqueda-interna">
+    <h2>Técnica 7: Búsqueda Interna</h2>
+    <p>Definición: Barra para buscar contenido.</p>
+    <pre><code><div class="search-bar">
+    <input type="text" placeholder="Buscar...">
+</div>
+        </code></pre>
+        <div class="demo">
+            <div class="search-bar">
+                <input type="text" placeholder="Buscar...">
+            </div>
+        </div>
+    </section><section id="enlaces-contextuales">
+    <h2>Técnica 8: Enlaces Contextuales</h2>
+    <p>Definición: Enlaces integrados en contenido.</p>
+    <pre><code><p>Escucha esta <a href="#" class="contextual-link">canción relacionada</a>.</p>
+        </code></pre>
+        <div class="demo">
+            <p>Escucha esta <a href="#" class="contextual-link">canción relacionada</a>.</p>
+        </div>
+    </section></body>
+</html>
+
