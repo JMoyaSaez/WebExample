@@ -29,6 +29,13 @@
       border: 4px solid #0f172a;
     }
 
+.btn {
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn.active, .btn.paused, .btn.muted {
+  transform: scale(1.05);
+}    
+
 .btn.active {
   background: #16a34a !important;  /* verde */
   color: white;
