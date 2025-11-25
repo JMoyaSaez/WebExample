@@ -99,3 +99,12 @@
       if (player.isMuted()) {
         player.unMute();
         muteBtn.textContent = "🔇 Mute";
+      } else {
+        player.mute();
+        muteBtn.textContent = "🔊 Unmute";
+      }
+    };
+  </script>
+
+</body>
+</html>
