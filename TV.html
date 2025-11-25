@@ -102,52 +102,80 @@
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
-    let player;
+  let player;
 
-    // 1) YouTube llama a esta función cuando la API está lista
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        videoId: 'K1s-zeOPE7w', // <-- ID del vídeo
-        playerVars: {
-          rel: 0,
-          modestbranding: 1
-        },
-        events: {
-          'onReady': onPlayerReady
-        }
-      });
+  function updateButtonsState() {
+    const playBtn  = document.getElementById("playBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const muteBtn  = document.getElementById("muteBtn");
+
+    // Reset de estados
+    playBtn.classList.remove("active");
+    pauseBtn.classList.remove("paused");
+    muteBtn.classList.remove("muted");
+
+    if (!player || !player.getPlayerState) return;
+
+    const state = player.getPlayerState();
+
+    // 1 - reproduciendo
+    if (state === YT.PlayerState.PLAYING) {
+      playBtn.classList.add("active");
     }
 
-    // 2) Cuando el player está listo, activamos los botones
-    function onPlayerReady() {
-      const playBtn  = document.getElementById("playBtn");
-      const pauseBtn = document.getElementById("pauseBtn");
-      const muteBtn  = document.getElementById("muteBtn");
-
-      playBtn.disabled  = false;
-      pauseBtn.disabled = false;
-      muteBtn.disabled  = false;
-
-      playBtn.onclick = () => {
-        if (player && player.playVideo) player.playVideo();
-      };
-
-      pauseBtn.onclick = () => {
-        if (player && player.pauseVideo) player.pauseVideo();
-      };
-
-      muteBtn.onclick = () => {
-        if (!player) return;
-        if (player.isMuted && player.isMuted()) {
-          player.unMute();
-          muteBtn.textContent = "🔇 Mute";
-        } else {
-          player.mute();
-          muteBtn.textContent = "🔊 Unmute";
-        }
-      };
+    // 2 - pausado
+    if (state === YT.PlayerState.PAUSED) {
+      pauseBtn.classList.add("paused");
     }
-  </script>
+
+    // mute
+    if (player.isMuted && player.isMuted()) {
+      muteBtn.classList.add("muted");
+    }
+  }
+
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+      videoId: 'K1s-zeOPE7w',
+      playerVars: { rel: 0, modestbranding: 1 },
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': updateButtonsState
+      }
+    });
+  }
+
+  function onPlayerReady() {
+    const playBtn  = document.getElementById("playBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const muteBtn  = document.getElementById("muteBtn");
+
+    playBtn.disabled = false;
+    pauseBtn.disabled = false;
+    muteBtn.disabled = false;
+
+    playBtn.onclick = () => {
+      player.playVideo();
+      updateButtonsState();
+    };
+
+    pauseBtn.onclick = () => {
+      player.pauseVideo();
+      updateButtonsState();
+    };
+
+    muteBtn.onclick = () => {
+      if (player.isMuted()) {
+        player.unMute();
+        muteBtn.textContent = "🔇 Mute";
+      } else {
+        player.mute();
+        muteBtn.textContent = "🔊 Unmute";
+      }
+      updateButtonsState();
+    };
+  }
+</script>
 
 </body>
 </html>
