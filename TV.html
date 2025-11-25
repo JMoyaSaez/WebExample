@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Vídeo HTML5 estilo TV</title>
+  <title>TV YouTube Controlada</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -12,47 +12,30 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Arial, sans-serif;
       color: #e5e7eb;
     }
 
     .tv-wrapper {
-      background: #111827;
       padding: 20px;
       border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
       text-align: center;
     }
 
     .tv {
-      background: #020617;
+      background: #000;
       border-radius: 24px;
       padding: 14px;
       border: 4px solid #0f172a;
-      position: relative;
-      overflow: hidden;
     }
 
     .tv-screen {
       border-radius: 18px;
       overflow: hidden;
-      background: #000;
+      width: 560px;
+      height: 315px;
     }
 
-    .tv-legs {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-    }
-
-    .tv-leg {
-      width: 40px;
-      height: 6px;
-      background: #0f172a;
-      border-radius: 3px;
-    }
-
-    /* Controles personalizados */
     .controls {
       margin-top: 14px;
       display: flex;
@@ -63,18 +46,10 @@
     .btn {
       border: none;
       padding: 8px 14px;
-      border-radius: 999px;
+      border-radius: 12px;
       background: #1d4ed8;
       color: white;
-      font-size: 14px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn.secondary {
-      background: #4b5563;
     }
 
     .btn:hover {
@@ -85,38 +60,31 @@
 <body>
 
   <div class="tv-wrapper">
-    <h1 style="margin-bottom:10px; font-size:1.1rem;">Mi vídeo de YouTube en una TV 🎬</h1>
+    <h1>Mi TV 🎬</h1>
 
     <div class="tv">
       <div class="tv-screen">
-        <!-- OJO: cambia VIDEO_ID por el ID real de tu vídeo -->
-        <div id="player"></div>
-      </div>
-      <div class="tv-legs">
-        <div class="tv-leg"></div>
-        <div class="tv-leg"></div>
+        <div id="player"></div> <!-- IMPORTANTÍSIMO -->
       </div>
     </div>
 
     <div class="controls">
       <button class="btn" id="playBtn">▶ Play</button>
-      <button class="btn secondary" id="pauseBtn">⏸ Pausa</button>
-      <button class="btn secondary" id="muteBtn">🔇 Mute</button>
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn" id="muteBtn">🔇 Mute</button>
     </div>
   </div>
 
-  <!-- Carga de la API de iframes de YouTube -->
+  <!-- Carga la API de YouTube -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
     let player;
 
-    // Esta función la llama automáticamente la API de YouTube
+    // La API llamará a esta función automáticamente
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
-        height: '315',
-        width: '560',
-        videoId: 'B6rKUf9DWRI', // ⇐ aquí pones el ID del vídeo de YouTube
+        videoId: 'VIDEO_ID_AQUI',  // ← CAMBIA ESTO
         playerVars: {
           rel: 0,
           modestbranding: 1
@@ -125,25 +93,9 @@
     }
 
     // Controles
-    document.getElementById('playBtn').addEventListener('click', () => {
-      if (player) player.playVideo();
-    });
-
-    document.getElementById('pauseBtn').addEventListener('click', () => {
-      if (player) player.pauseVideo();
-    });
-
-    document.getElementById('muteBtn').addEventListener('click', () => {
-      if (!player) return;
+    document.getElementById("playBtn").onclick = () => player.playVideo();
+    document.getElementById("pauseBtn").onclick = () => player.pauseVideo();
+    document.getElementById("muteBtn").onclick = () => {
       if (player.isMuted()) {
         player.unMute();
-        document.getElementById('muteBtn').textContent = '🔇 Mute';
-      } else {
-        player.mute();
-        document.getElementById('muteBtn').textContent = '🔊 Unmute';
-      }
-    });
-  </script>
-
-</body>
-</html>
+        muteBtn.textContent = "🔇 Mute";
