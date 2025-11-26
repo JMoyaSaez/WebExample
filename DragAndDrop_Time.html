@@ -143,67 +143,74 @@
 </script>
 
 <!-- ************************************************************************ -->
-<div id="timerBox">⏱ Tiempo: 0s</div>
+<!-- Cronómetro -->
+<div id="timerBox">⏱ 00:00.000</div>
 
 <style>
   #timerBox {
     position: fixed;
     top: 10px;
     left: 10px;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0,0,0,0.8);
     color: #fff;
     padding: 8px 14px;
     border-radius: 10px;
     font-size: 16px;
     z-index: 9999;
-    font-family: Arial, sans-serif;
+    font-family: monospace;
+    letter-spacing: 1px;
   }
 </style>
 
+
 <script>
-  let timer = 0;
+  let startTime = null;
   let timerInterval = null;
   let puzzleStarted = false;
-  let piecesCorrectas = 0;  // ⚠️ Ajusta según piezas totales
+  let piecesCorrectas = 0;        // Cambia este valor según tu puzzle
+  const piezasTotales = 3;        // Ajusta aquí si tienes 3, 4, 9...
 
-  // Función para iniciar el temporizador
+  function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    const milliseconds = (ms % 1000).toString().padStart(3, '0');
+    return `${minutes}:${seconds}.${milliseconds}`;
+  }
+
   function startTimer() {
     if (!puzzleStarted) {
       puzzleStarted = true;
+      startTime = performance.now();
+      
       timerInterval = setInterval(() => {
-        timer++;
-        document.getElementById("timerBox").textContent = `⏱ Tiempo: ${timer}s`;
-      }, 1000);
+        const current = performance.now() - startTime;
+        document.getElementById("timerBox").textContent = `⏱ ${formatTime(current)}`;
+      }, 10); // actualiza cada 10 ms
     }
   }
 
-  // Función para detener el temporizador
   function stopTimer() {
     clearInterval(timerInterval);
   }
 
-  // ACTIVA EL TEMPORIZADOR AL EMPEZAR A ARRASTRAR
+  // Arranca al mover la primera pieza
   document.querySelectorAll(".piece").forEach(piece => {
     piece.addEventListener("dragstart", startTimer);
   });
 
-  // Cuando el puzzle se complete, detener el temporizador
   function checkCompletion() {
-    if (piecesCorrectas === 3) {  // ⚠️ CAMBIAR 3 si hay más piezas
+    if (piecesCorrectas === piezasTotales) {
       stopTimer();
-      alert(`🎉 ¡Puzzle completado en ${timer}s!`);
+      
+      const timeFinal = document.getElementById("timerBox").textContent.replace("⏱", "").trim();
+      setTimeout(() => {
+        alert(`🎉 ¡Puzzle completado!\n⏱ Tiempo final: ${timeFinal}`);
+      }, 200);
     }
   }
-
-  // Modifica tu evento DROP dentro de cada slot:
-  // Añade esta parte al final del drop correcto:
-
-  /*
-      piecesCorrectas++;
-      checkCompletion();
-  */
-
 </script>
+
 
 
 </body>
