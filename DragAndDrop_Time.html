@@ -105,10 +105,17 @@
           slot.classList.add("correct");
           slot.textContent = draggedPiece.textContent;
           draggedPiece.remove(); // Quita la pieza de arriba
+
+          checkCompletion();  // ← añade esta línea
         } else {
           alert("❌ Esa pieza no va ahí.");
         }
       });
+
+
+
+
+      
 
     });
   </script>
