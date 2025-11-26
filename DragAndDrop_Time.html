@@ -144,7 +144,7 @@
 
 <!-- ************************************************************************ -->
 <!-- Cronómetro -->
-<div id="timerBox">⏱ 00:00.000</div>
+<div id="timerBox">⏱ 0.000 s</div>
 
 <style>
   #timerBox {
@@ -162,31 +162,21 @@
   }
 </style>
 
-
 <script>
   let startTime = null;
   let timerInterval = null;
   let puzzleStarted = false;
-  let piecesCorrectas = 0;        // Cambia este valor según tu puzzle
-  const piezasTotales = 3;        // Ajusta aquí si tienes 3, 4, 9...
-
-  function formatTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-    const milliseconds = (ms % 1000).toString().padStart(3, '0');
-    return `${minutes}:${seconds}.${milliseconds}`;
-  }
 
   function startTimer() {
     if (!puzzleStarted) {
       puzzleStarted = true;
       startTime = performance.now();
-      
+
       timerInterval = setInterval(() => {
-        const current = performance.now() - startTime;
-        document.getElementById("timerBox").textContent = `⏱ ${formatTime(current)}`;
-      }, 10); // actualiza cada 10 ms
+        const elapsedMs = performance.now() - startTime;
+        const seconds = (elapsedMs / 1000).toFixed(3); // 3 decimales
+        document.getElementById("timerBox").textContent = `⏱ ${seconds} s`;
+      }, 50); // actualizar cada 50 ms (suficiente)
     }
   }
 
@@ -194,22 +184,28 @@
     clearInterval(timerInterval);
   }
 
-  // Arranca al mover la primera pieza
+  // Arranca al empezar a arrastrar la primera pieza
   document.querySelectorAll(".piece").forEach(piece => {
     piece.addEventListener("dragstart", startTimer);
   });
 
+  // Comprueba si todas las casillas están correctas
   function checkCompletion() {
-    if (piecesCorrectas === piezasTotales) {
+    const slots = document.querySelectorAll(".slot");
+    const allCorrect = Array.from(slots).every(slot =>
+      slot.classList.contains("correct")
+    );
+
+    if (allCorrect) {
       stopTimer();
-      
-      const timeFinal = document.getElementById("timerBox").textContent.replace("⏱", "").trim();
+      const finalTime = document.getElementById("timerBox").textContent.replace("⏱", "").trim();
       setTimeout(() => {
-        alert(`🎉 ¡Puzzle completado!\n⏱ Tiempo final: ${timeFinal}`);
+        alert(`🎉 ¡Puzzle completado!\nTiempo final: ${finalTime}`);
       }, 200);
     }
   }
 </script>
+
 
 
 
