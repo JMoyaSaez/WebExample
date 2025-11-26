@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Puzzle Drag & Drop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      background: #f3f4f6;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .pieces, .board {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .piece, .slot {
+      width: 120px;
+      height: 120px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: grab;
+    }
+
+    .piece {
+      background: #6366f1;
+      color: white;
+    }
+
+    .slot {
+      border: 3px dashed #9ca3af;
+      background: #e5e7eb;
+      color: #9ca3af;
+    }
+
+    .slot.correct {
+      border-color: #10b981;
+      background: #d1fae5;
+      color: #065f46;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Puzzle Drag & Drop 🧩</h1>
+
+  <p>Arrastra cada pieza a su posición correcta.</p>
+
+  <!-- PIEZAS -->
+  <div class="pieces">
+    <div class="piece" draggable="true" id="p1">1</div>
+    <div class="piece" draggable="true" id="p2">2</div>
+    <div class="piece" draggable="true" id="p3">3</div>
+  </div>
+
+  <!-- TABLERO / SLOTS VACÍOS -->
+  <div class="board">
+    <div class="slot" data-piece="p1">1</div>
+    <div class="slot" data-piece="p2">2</div>
+    <div class="slot" data-piece="p3">3</div>
+  </div>
+
+  <script>
+    // Guardamos el ID de la pieza que arrastramos
+    let draggedPiece = null;
+
+    document.querySelectorAll(".piece").forEach(piece => {
+
+      piece.addEventListener("dragstart", () => {
+        draggedPiece = piece;
+      });
+
+      piece.addEventListener("dragend", () => {
+        draggedPiece = null;
+      });
+
+    });
+
+    document.querySelectorAll(".slot").forEach(slot => {
+
+      slot.addEventListener("dragover", e => {
+        e.preventDefault(); // Permite soltar
+      });
+
+      slot.addEventListener("drop", () => {
+        const correctId = slot.dataset.piece;
+
+        if (draggedPiece.id === correctId) {
+          slot.classList.add("correct");
+          slot.textContent = draggedPiece.textContent;
+          draggedPiece.remove(); // Quita la pieza de arriba
+        } else {
+          alert("❌ Esa pieza no va ahí.");
+        }
+      });
+
+    });
+  </script>
+
+</body>
+</html>
