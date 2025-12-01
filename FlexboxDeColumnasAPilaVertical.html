@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Columnas Flexbox Responsivas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos Base y Tipografía */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e8eaf6; /* Fondo Lavanda Suave */
+            padding: 20px;
+        }
+
+        /* ---------------------------------------------------- */
+        /* CONTENEDOR FLEXBOX (Desktop - Lado a Lado) */
+        /* ---------------------------------------------------- */
+        .flex-container {
+            display: flex;
+            flex-direction: row; /* Predeterminado en desktop */
+            justify-content: center; /* Centrado horizontalmente */
+            align-items: flex-start; /* Alineación vertical al inicio */
+            gap: 20px; /* Espaciado entre columnas */
+            
+            width: 100%;
+            max-width: 900px;
+            min-height: 400px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            background-color: white;
+            border: 3px dashed #7986cb; /* Borde dashed para estructura */
+            border-radius: 12px;
+            transition: all 0.5s ease-in-out; /* Sugerencia de transición animada */
+        }
+
+        /* ---------------------------------------------------- */
+        /* ITEMS (Columnas Coloridas) */
+        /* ---------------------------------------------------- */
+        .flex-item {
+            /* flex-grow: 1 permite que cada columna crezca para ocupar el espacio */
+            flex: 1; 
+            min-width: 200px; /* Ancho mínimo para mantener la estructura */
+            padding: 30px;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .item-1 { background-color: #ff6347; } /* Rojo Tomate */
+        .item-2 { background-color: #4682b4; } /* Azul Acero */
+        .item-3 { background-color: #3cb371; } /* Verde Menta */
+        
+        /* ---------------------------------------------------- */
+        /* MEDIA QUERY: MÓVIL (Apilado Vertical) */
+        /* ---------------------------------------------------- */
+        @media (max-width: 640px) {
+            .flex-container {
+                /* ¡Transformación clave! Cambiar de row a column */
+                flex-direction: column; 
+                /* Ya no necesitamos justify-content center, pero lo mantenemos */
+                justify-content: flex-start; 
+                /* Alineación al centro en el nuevo eje (horizontal) */
+                align-items: center; 
+                gap: 15px;
+                min-height: auto;
+                padding: 15px;
+            }
+
+            .flex-item {
+                /* En móvil, cada ítem ocupa el ancho completo del contenedor */
+                width: 90%; 
+                min-width: auto;
+                /* El padding y la altura pueden reducirse para móvil si es necesario */
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="text-3xl font-bold mb-4 text-gray-800">Flexbox: De Columnas a Pila Vertical</h1>
+    <p class="text-gray-600 mb-6">Redimensiona el ancho de la ventana por debajo de 640px para ver la transición de layout.</p>
+
+    <!-- Código Snippet Flotante (simulado) -->
+    <div class="fixed top-4 right-4 p-3 bg-gray-900 text-green-400 rounded-lg shadow-xl hidden md:block" style="z-index: 10;">
+        <h3 class="font-mono text-sm mb-1">@media (max-width: 640px)</h3>
+        <pre class="font-mono text-xs">
+.flex-container {
+    flex-direction: column;
+    align-items: center;
+}
+        </pre>
+    </div>
+
+    <div class="flex-container">
+        <div class="flex-item item-1">
+            Columna 1
+            <div class="text-xs font-normal mt-2">Flex-grow: 1</div>
+        </div>
+        <div class="flex-item item-2">
+            Columna 2
+            <div class="text-xs font-normal mt-2">justify-content: center</div>
+        </div>
+        <div class="flex-item item-3">
+            Columna 3
+            <div class="text-xs font-normal mt-2">En móvil: flex-direction: column</div>
+        </div>
+    </div>
+
+</body>
+</html>
