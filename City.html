@@ -3,159 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejemplo Completo: Ciudad Futurista con HTML5 y CSS3</title>
-    <!-- Enlace a Bootstrap CDN para componentes responsivos (de la actividad con Bootstrap) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Estilos CSS3 personalizados integrando todos los conceptos -->
+    <title>Ciudad Futurista Animada con Transiciones CSS3</title>
+    <!-- Estilos CSS3 con énfasis en transiciones y animaciones visibles -->
     <style>
-        /* Variables CSS para consistencia y fácil mantenimiento */
+        /* Variables CSS para control de velocidades y colores consistentes */
         :root {
-            --primary-color: #ff7e5f; /* Color principal (naranja cálido) */
-            --secondary-color: #feb47b; /* Color secundario (amarillo suave) */
-            --shadow-light: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra ligera */
-            --shadow-dark: 4px 4px 10px rgba(0, 0, 0, 0.5); /* Sombra más profunda */
-            --font-size-base: 16px; /* Tamaño de fuente base */
-            --transition-speed: 0.3s; /* Velocidad de transiciones */
+            --transition-speed: 0.5s; /* Velocidad de transiciones visibles */
+            --glow-color: #ff7e5f; /* Color para efectos de glow */
+            --shadow-light: 4px 4px 10px rgba(0,0,0,0.3); /* Sombra inicial */
+            --shadow-glow: 6px 6px 15px #ff7e5f; /* Sombra con glow al hover */
+            --primary-gradient: linear-gradient(to bottom, #feb47b, #ff7e5f); /* Gradiente base */
+            --hover-gradient: linear-gradient(to top, #ff7e5f, #feb47b); /* Gradiente invertido para transición */
         }
 
-        /* Estilos avanzados: Gradientes y tipografías personalizadas */
+        /* Estilos avanzados: Gradientes y sombras */
         body {
-            font-family: 'Roboto', sans-serif; /* Tipografía personalizada (agrega Google Fonts si necesitas: <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">) */
-            background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color)); /* Gradiente lineal para fondo dinámico */
             margin: 0;
             padding: 0;
-            font-size: var(--font-size-base);
+            font-family: sans-serif;
+            background: var(--primary-gradient); /* Fondo con gradiente */
             color: #333;
+            transition: background var(--transition-speed); /* Transición visible en body para cambio global */
         }
 
-        /* Estructura semántica de HTML5 */
-        header {
-            background: radial-gradient(circle, var(--primary-color), var(--secondary-color)); /* Gradiente radial para header */
+        body:hover {
+            background: var(--hover-gradient); /* Observa el cambio de gradiente al hover en body (para demo) */
+        }
+
+        /* Estructura semántica HTML5 */
+        .sky {
             text-align: center;
             padding: 20px;
-            box-shadow: var(--shadow-dark); /* Sombra en elemento */
+            box-shadow: var(--shadow-light);
+            transition: background var(--transition-speed), box-shadow var(--transition-speed); /* Transiciones visibles */
         }
 
-        h1 {
-            text-shadow: var(--shadow-light); /* Sombra en texto */
+        .sky:hover {
+            background: var(--hover-gradient);
+            box-shadow: var(--shadow-glow); /* Glow visible al hover */
         }
 
-        /* Layout con CSS Grid para la "ciudad" (diseños complejos en 2D) */
+        /* Layout con CSS Grid para la ciudad */
         .city-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Columnas responsivas */
-            gap: 20px; /* Espaciamiento entre celdas */
+            gap: 20px;
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            transition: gap var(--transition-speed); /* Transición visible en gap para ajuste dinámico */
         }
 
-        /* Componentes como "edificios" con sombras y transiciones */
+        /* Edificios con transiciones visibles al hover */
         .building {
             background: #fff;
             border-radius: 10px;
-            box-shadow: var(--shadow-light); /* Sombra inicial */
             padding: 15px;
             text-align: center;
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease; /* Transición suave */
+            box-shadow: var(--shadow-light);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background var(--transition-speed); /* Múltiples transiciones visibles */
         }
 
         .building:hover {
-            transform: scale(1.05); /* Escala al hover */
-            box-shadow: var(--shadow-dark); /* Sombra más profunda al hover */
+            transform: translateY(-10px) rotate(2deg); /* Movimiento y rotación visible */
+            box-shadow: var(--shadow-glow); /* Cambio de sombra a glow */
+            background: #f0f0f0; /* Cambio de fondo suave */
         }
 
-        /* Animaciones con @keyframes para un elemento dinámico (e.g., "sol" pulsante) */
-        .sun {
-            width: 50px;
-            height: 50px;
+        /* Luces con animaciones keyframes para "cobrar vida" constantemente */
+        .light {
+            width: 20px;
+            height: 20px;
             background: yellow;
             border-radius: 50%;
             margin: 10px auto;
-            animation: pulsar 2s infinite alternate; /* Animación infinita */
+            animation: glow 1.5s infinite alternate; /* Animación visible infinita */
+            transition: scale var(--transition-speed); /* Transición adicional al hover */
         }
 
-        @keyframes pulsar {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0.5; transform: scale(1.2); }
+        .light:hover {
+            scale: 1.5; /* Escalado visible */
         }
 
-        /* Layout con Flexbox para el footer (diseño flexible unidimensional) */
-        footer {
+        @keyframes glow {
+            0% { opacity: 1; box-shadow: 0 0 5px yellow; } /* Inicio visible */
+            50% { opacity: 0.5; box-shadow: 0 0 15px orange; } /* Mitad con glow expandido */
+            100% { opacity: 1; box-shadow: 0 0 5px yellow; } /* Fin visible */
+        }
+
+        /* Footer con Flexbox y transición visible */
+        .street {
             display: flex;
-            justify-content: space-around; /* Alineación horizontal */
-            align-items: center; /* Alineación vertical */
-            flex-wrap: wrap; /* Multilíneas en pantallas pequeñas */
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
             background: #333;
             color: white;
             padding: 10px;
             margin-top: 20px;
+            transition: background var(--transition-speed), transform var(--transition-speed); /* Transiciones visibles */
         }
 
-        footer p {
-            margin: 5px;
+        .street:hover {
+            background: #444; /* Cambio de color visible */
+            transform: scale(1.02); /* Ligero escalado */
         }
 
-        /* Media Queries para diseño responsivo */
+        /* Media Queries para responsividad: Ajustes que mantienen transiciones visibles en móviles */
         @media (max-width: 768px) {
-            body { font-size: calc(var(--font-size-base) - 2px); } /* Reduce tamaño de fuente en móviles */
-            .city-grid { grid-template-columns: 1fr; } /* Una columna en pantallas pequeñas */
-            header { padding: 10px; } /* Ajustes para compactar */
+            .city-grid {
+                grid-template-columns: 1fr; /* Una columna */
+                gap: 10px; /* Gap reducido, observable */
+            }
+            .building {
+                font-size: 14px; /* Ajuste de tamaño */
+            }
+            /* Mantén transiciones: Reduce velocidad si es necesario para performance, pero observa en pruebas */
+            :root { --transition-speed: 0.4s; }
         }
 
-        /* Buenas prácticas: Clases reutilizables, sin IDs excesivos, código modular */
-        /* Nota: Para minificación en producción, usa tools como CSSNano */
+        /* Buenas prácticas: Código modular con comentarios */
+        /* Estilos avanzados arriba, layouts en medio, animaciones/transiciones abajo */
     </style>
 </head>
 <body>
-    <!-- Estructura semántica HTML5: Header con multimedia (ejemplo de video) -->
-    <header>
-        <h1>¡Bienvenido a mi Ciudad Futurista!</h1>
-        <p>Explora edificios con superpoderes CSS3.</p>
-        <!-- Multimedia nativa HTML5: Video con controles -->
-        <video controls width="300">
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-            Tu navegador no soporta video.
-        </video>
+    <!-- Header como "cielo" con transición visible -->
+    <header class="sky">
+        <h1>Ciudad Futurista en Movimiento</h1>
+        <p>Hoverea para ver transiciones y animaciones cobrar vida.</p>
     </header>
 
-    <!-- Main con Grid: "Edificios" como cards reutilizables -->
+    <!-- Main con Grid: Edificios con transiciones y luces animadas -->
     <main class="city-grid">
         <div class="building">
-            <div class="sun"></div> <!-- Elemento animado -->
-            <h2>Edificio Flex</h2>
-            <p>Usa Flexbox para alineación flexible.</p>
-            <!-- Formulario mejorado HTML5 -->
-            <form>
-                <input type="email" placeholder="Email" required>
-                <button type="submit">Enviar</button>
-            </form>
+            <div class="light"></div> <!-- Luz con animación visible -->
+            <h2>Edificio 1</h2>
+            <p>Hover para levitar y glow.</p>
         </div>
         <div class="building">
-            <div class="sun"></div>
-            <h2>Edificio Grid</h2>
-            <p>Layout bidimensional con Grid.</p>
+            <div class="light"></div>
+            <h2>Edificio 2</h2>
+            <p>Observa el rotado sutil.</p>
         </div>
         <div class="building">
-            <div class="sun"></div>
-            <h2>Edificio Animado</h2>
-            <p>Con transiciones y keyframes.</p>
+            <div class="light"></div>
+            <h2>Edificio 3</h2>
+            <p>Transición de fondo y sombra.</p>
         </div>
     </main>
 
-    <!-- Footer con Flexbox y Bootstrap (para botón responsivo) -->
-    <footer>
-        <p>&copy; 2025 - Ciudad Futurista con CSS3</p>
-        <!-- Botón de Bootstrap (de la actividad curiosa) -->
-        <button class="btn btn-primary">Explorar Más</button>
+    <!-- Footer como "calle" con Flexbox y transición visible -->
+    <footer class="street">
+        <p>¡Observa las transiciones en acción! &copy; 2025</p>
     </footer>
-
-    <!-- Script JavaScript simple para integración (de Clase 2) -->
-    <script>
-        // Manipulación DOM y evento
-        document.querySelector('button').addEventListener('click', function() {
-            alert('¡Explorando la ciudad con JS!');
-        });
-    </script>
 </body>
 </html>
