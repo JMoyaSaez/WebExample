@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blueprint de CSS Grid Responsivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Aplicación de fuente Inter para mejor legibilidad */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+        }
+
+        /* ---------------------------------------------------- */
+        /* CONFIGURACIÓN DEL GRID (ESTILO BLUEPRINT - ESCRITORIO) */
+        /* ---------------------------------------------------- */
+        .grid-container {
+            display: grid;
+            /* Definición de Columnas: 1 unidad para sidebar, 3 unidades para main content */
+            grid-template-columns: [sidebar-start] 1fr [main-start] 3fr [end-col];
+            /* Definición de Filas: auto para header y footer, 1fr para el contenido */
+            grid-template-rows: [header-start] auto [content-start] 1fr [footer-start] auto [end-row];
+            
+            /* Espaciado (Gap) Visible */
+            gap: 20px;
+            
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Estilos de Líneas Guía Rojas y Colores Funcionales */
+        .grid-item {
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: white;
+            /* Líneas Guía Rojas */
+            border: 2px dashed #ff0000; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ---------------------------------------------------- */
+        /* POSICIONAMIENTO DE CELDAS EN GRID (ESCRITORIO) */
+        /* ---------------------------------------------------- */
+
+        /* Header: Span Full-Width */
+        .header {
+            background-color: #ff4500; /* Rojo para Header (Funcional) */
+            grid-column: sidebar-start / end-col; /* De inicio a fin de columnas */
+            grid-row: header-start / content-start;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: #ffd700; /* Amarillo/Dorado para Sidebar */
+            grid-column: sidebar-start / main-start; /* Solo la primera columna */
+            grid-row: content-start / footer-start; /* Toda la altura del contenido */
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: #1e90ff; /* Azul para Main Content (Funcional) */
+            grid-column: main-start / end-col; /* Solo la segunda columna */
+            grid-row: content-start / footer-start; /* Toda la altura del contenido */
+        }
+        
+        /* Footer: Span Full-Width (Para completar el layout) */
+        .footer {
+            background-color: #8a2be2; /* Azul violeta para Footer */
+            grid-column: sidebar-start / end-col;
+            grid-row: footer-start / end-row;
+        }
+
+        /* ---------------------------------------------------- */
+        /* RESPONSIVO (AJUSTE A VISTA TABLET/MÓVIL) */
+        /* ---------------------------------------------------- */
+
+        @media (max-width: 768px) {
+            /* En pantallas más pequeñas, se convierte en una sola columna */
+            .grid-container {
+                /* Columna única */
+                grid-template-columns: 1fr;
+                /* Las filas se apilan en orden */
+                grid-template-rows: auto auto 1fr auto; 
+                height: auto; /* Permite desplazamiento vertical */
+            }
+
+            /* Header: Mantiene su posición y ancho completo (implícito 1fr) */
+            .header {
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+
+            /* Sidebar: Se mueve bajo el Header, ancho completo */
+            .sidebar {
+                grid-column: 1 / -1;
+                grid-row: 2;
+                min-height: 150px; /* Para que se vea bien apilado */
+            }
+
+            /* Main Content: Se mueve bajo el Sidebar, ancho completo y toma el espacio restante */
+            .main-content {
+                grid-column: 1 / -1;
+                grid-row: 3;
+                min-height: 300px; /* Asegura un área de contenido visible */
+            }
+
+            /* Footer: Se mueve al final */
+            .footer {
+                grid-column: 1 / -1;
+                grid-row: 4;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <h1 class="text-3xl font-bold mb-4 text-gray-800">Layout CSS Grid - Estilo Blueprint</h1>
+    <p class="text-gray-600 mb-6">Redimensiona la ventana (o simula la vista de tablet/móvil) para ver la transición responsive.</p>
+
+    <div class="grid-container">
+        <div class="grid-item header">
+            HEADER (100% Ancho)
+            <div class="text-sm mt-2">Grid Column: sidebar-start / end-col</div>
+        </div>
+
+        <div class="grid-item sidebar">
+            SIDEBAR (1fr)
+            <div class="text-sm mt-2">Grid Column: sidebar-start / main-start</div>
+            <div class="text-sm">En Tablet/Móvil se apila debajo del Header.</div>
+        </div>
+
+        <div class="grid-item main-content">
+            MAIN CONTENT (3fr)
+            <div class="text-sm mt-2">Grid Column: main-start / end-col</div>
+            <div class="text-sm">En Tablet/Móvil se apila debajo del Sidebar.</div>
+        </div>
+        
+        <div class="grid-item footer">
+            FOOTER (100% Ancho)
+            <div class="text-sm mt-2">Grid Column: sidebar-start / end-col</div>
+        </div>
+    </div>
+
+</body>
+</html>
