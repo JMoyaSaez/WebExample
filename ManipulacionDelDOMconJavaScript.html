@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manipulación del DOM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos base */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Azul claro muy suave */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo del Contenedor de Resultado */
+        .result-box {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 2px dashed #4299e1; /* Borde para simular estructura */
+        }
+
+        /* Estilo del texto a manipular (highlighted) */
+        #targetText {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d97706; /* Naranja medio */
+            transition: color 0.3s ease;
+        }
+
+        /* Estilo del botón */
+        .manipulate-btn {
+            background-color: #10b981; /* Verde esmeralda */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 1rem;
+        }
+
+        .manipulate-btn:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">Interacción JavaScript ↔ DOM</h1>
+
+    <div class="result-box">
+        <p class="text-gray-500 mb-2">Contenido Original:</p>
+        <!-- Este es el elemento que será manipulado por JS -->
+        <p id="targetText">
+            Este texto va a cambiar con JavaScript.
+        </p>
+    </div>
+
+    <button class="manipulate-btn" onclick="changeContent()">
+        Ejecutar Script JS
+    </button>
+
+    <div id="consoleLog" class="mt-8 p-4 bg-gray-800 text-gray-200 w-full max-w-xl rounded-lg font-mono text-sm overflow-x-auto">
+        <span class="text-green-400"># Dev Console (Simulado)</span>
+    </div>
+
+    <script>
+        // Función principal para la manipulación del DOM
+        function changeContent() {
+            // 1. Obtener el elemento del DOM usando su ID
+            const element = document.getElementById('targetText');
+            
+            // 2. Definir el nuevo contenido
+            const newContent = "¡El DOM ha sido MANIPULADO exitosamente por JS!";
+            
+            // 3. Aplicar el nuevo contenido a la propiedad innerText del elemento
+            element.innerText = newContent;
+            element.style.color = '#dc2626'; // Cambiar color para resaltar la manipulación
+
+            // Log en la consola simulada
+            logToConsole(`Elemento encontrado: <p id="targetText">...</p>`);
+            logToConsole(`Propiedad 'innerText' cambiada a: "${newContent}"`, 'yellow');
+            logToConsole('¡Manipulación completada!', 'green');
+        }
+
+        // Función para simular el logging en la consola de desarrollo
+        function logToConsole(message, color = 'white') {
+            const consoleDiv = document.getElementById('consoleLog');
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-${color}-400">>&nbsp;</span>${message}`;
+            consoleDiv.appendChild(logEntry);
+            // Hacer scroll hasta el final
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
