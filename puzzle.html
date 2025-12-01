@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Puzzle 4x4 Drag & Drop con tu imagen</title>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        background:#222;
+        color:#fff;
+        padding:1rem;
+    }
+    h1{margin-bottom:.5rem;text-align:center}
+    p{margin-bottom:1rem;text-align:center;max-width:600px}
+
+    .uploader{
+        border:2px dashed #555;
+        border-radius:12px;
+        padding:1rem 1.5rem;
+        margin-bottom:1.2rem;
+        background:#111;
+        text-align:center;
+        cursor:pointer;
+        transition:border-color .2s, background .2s, box-shadow .2s;
+        max-width:520px;
+        width:100%;
+    }
+    .uploader strong{display:block;margin-bottom:.3rem}
+    .uploader span{font-size:.9rem;color:#ccc}
+    .uploader.dragover{
+        border-color:#4dabf7;
+        background:#151515;
+        box-shadow:0 0 12px rgba(77,171,247,.7);
+    }
+    .uploader input[type="file"]{
+        position:absolute;
+        inset:0;
+        opacity:0;
+        cursor:pointer;
+    }
+    .uploader-inner{
+        position:relative;
+    }
+
+    .puzzle-wrapper{
+        background:#111;
+        padding:10px;
+        border-radius:16px;
+        box-shadow:0 15px 30px rgba(0,0,0,.5);
+    }
+    .puzzle-grid{
+        display:grid;
+        gap:3px;
+        grid-template-columns:repeat(4,1fr);
+        width:min(80vw,520px);
+        height:min(80vw,520px);
+    }
+    .tile{
+        border-radius:8px;
+        cursor:grab;
+        background-repeat:no-repeat;
+        /* se recalcula en JS según filas/columnas, pero dejamos valor por defecto */
+        background-size:400% 400%;
+        position:relative;
+        overflow:hidden;
+    }
+    .tile::after{
+        /* numerito de ayuda */
+        content:attr(data-num);
+        position:absolute;
+        bottom:4px;
+        right:6px;
+        font-size:.9rem;
+        padding:2px 6px;
+        border-radius:999px;
+        background:rgba(0,0,0,.55);
+    }
+    .tile.dragging{
+        opacity:.75;
+        outline:3px solid #ffdd55;
+        cursor:grabbing;
+    }
+    .tile.over{
+        outline:3px solid #4dabf7;
+    }
+    #msg{margin-top:1rem;font-weight:600;min-height:1.2em;text-align:center}
+</style>
+</head>
+<body>
+<h1>Puzzle 4x4 🧩</h1>
+<p>Arrastra una imagen al área de abajo (o haz clic para elegir una) y la usaremos como puzzle. Luego arrastra las fichas para intercambiarlas.</p>
+
+<div id="dropZone" class="uploader">
+    <div class="uploader-inner">
+        <strong>📂 Suelta aquí una imagen o haz clic</strong>
+        <span>Se usará como fondo del puzzle (4x4)</span>
+        <input id="fileInput" type="file" accept="image/*">
+    </div>
+</div>
+
+<div class="puzzle-wrapper">
+    <div id="puzzle" class="puzzle-grid"></div>
+</div>
+
+<div id="msg"></div>
+
+<script>
+(function () {
+    const ROWS = 4;
+    const COLS = 4;
+    const TOTAL = ROWS * COLS;
+    const DEFAULT_IMAGE = "puzzle3x3.png"; // opcional, por si quieres una imagen por defecto
+
+    const puzzle  = document.getElementById("puzzle");
+    const msg     = document.getElementById("msg");
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+
+    let tiles = [];
+    let dragged = null;
+
+    // ------------------- Zona de subida de imagen -------------------
+    dropZone.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener("change", e => {
+        const file = e.target.files[0];
+        handleImageFile(file);
+        // Para poder seleccionar la misma imagen otra vez si quieres
+        e.target.value = "";
+    });
+
+    dropZone.addEventListener("dragenter", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragover", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("dragover");
+
+        const file = e.dataTransfer.files[0];
+        handleImageFile(file);
+    });
+
+    function handleImageFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            msg.textContent = "⚠️ Por favor, suelta un archivo de imagen.";
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+            const url = e.target.result;  // data URL
+            createPuzzle(url);
+            msg.textContent = "✅ Imagen cargada. ¡Resuelve el puzzle!";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ------------------- Lógica del puzzle -------------------
+    function createPuzzle(imageUrl) {
+        // Limpia puzzle y estados
+        puzzle.innerHTML = "";
+        tiles = [];
+        dragged = null;
+        msg.textContent = "";
+
+        // Crea las fichas
+        for (let i = 0; i < TOTAL; i++) {
+            const tile = document.createElement("div");
+            tile.className = "tile";
+            tile.draggable = true;
+            tile.dataset.index = i;     // posición correcta
+            tile.dataset.num = i + 1;
+
+            const row = Math.floor(i / COLS);
+            const col = i % COLS;
+
+            tile.style.backgroundImage = `url("${imageUrl}")`;
+            // hacemos que el tamaño de fondo dependa del nº de filas/columnas
+            tile.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
+            tile.style.backgroundPosition = `${(col / (COLS - 1)) * 100}% ${(row / (ROWS - 1)) * 100}%`;
+
+            addTileEvents(tile);
+            tiles.push(tile);
+        }
+
+        // Baraja las fichas y añádelas al grid
+        shuffle(tiles).forEach(t => puzzle.appendChild(t));
+    }
+
+    function addTileEvents(tile) {
+        tile.addEventListener("dragstart", () => {
+            dragged = tile;
+            tile.classList.add("dragging");
+        });
+
+        tile.addEventListener("dragend", () => {
+            if (dragged) dragged.classList.remove("dragging");
+            dragged = null;
+            clearOver();
+        });
+
+        tile.addEventListener("dragover", e => {
+            e.preventDefault();
+            if (tile !== dragged) {
+                tile.classList.add("over");
+            }
+        });
+
+        tile.addEventListener("dragleave", () => {
+            tile.classList.remove("over");
+        });
+
+        tile.addEventListener("drop", e => {
+            e.preventDefault();
+            if (!dragged || dragged === tile) return;
+
+            swapTiles(dragged, tile);
+            clearOver();
+            checkSolved();
+        });
+    }
+
+    function swapTiles(a, b) {
+        const temp = document.createElement("div");
+        puzzle.replaceChild(temp, a);
+        puzzle.replaceChild(a, b);
+        puzzle.replaceChild(b, temp);
+    }
+
+    function clearOver() {
+        document.querySelectorAll(".tile.over").forEach(t => t.classList.remove("over"));
+    }
+
+    function checkSolved() {
+        const current = Array.from(puzzle.children);
+        const solved = current.every((t, i) => Number(t.dataset.index) === i);
+        if (solved && current.length === TOTAL) {
+            msg.textContent = "🎉 ¡Puzzle completado!";
+        } else {
+            // solo borramos el mensaje si no era el de error de imagen
+            if (!msg.textContent.startsWith("⚠️")) {
+                msg.textContent = "";
+            }
+        }
+    }
+
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // Opcional: crea un puzzle inicial con una imagen por defecto
+    // Si no quieres imagen por defecto, comenta esta línea.
+    createPuzzle(DEFAULT_IMAGE);
+})();
+</script>
+</body>
+</html>
