@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demostración de Responsividad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Base (Móvil Primero - Smartphone) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0f7fa; /* Cian Claro */
+            transition: background-color 0.5s ease;
+        }
+        
+        /* Contenedor Principal (1 columna por defecto) */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            padding: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Estilos del Header y Navegación (Móvil) */
+        .header {
+            background-color: #00bcd4; /* Cian Vibrante */
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* En móvil, la navegación se oculta y solo se muestra el botón hamburguesa */
+        .full-nav {
+            display: none; 
+        }
+
+        /* Botón Hamburger (Visible solo en móvil) */
+        .hamburger-btn {
+            display: block;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Estilos de Contenido Base */
+        .content-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #b2ebf2;
+        }
+
+        /* ------------------------------------------- */
+        /* MEDIA QUERY: TABLET (Mínimo 640px) */
+        /* ------------------------------------------- */
+        @media (min-width: 640px) {
+            /* Cambio de fondo para simular la transformación */
+            body {
+                background-color: #ffe0b2; /* Naranja Claro */
+            }
+
+            .layout-grid {
+                /* Layout de 2 columnas: Sidebar y Main */
+                grid-template-columns: 1fr 2fr; 
+            }
+
+            .header {
+                /* El header ahora ocupa las dos columnas */
+                grid-column: 1 / -1; 
+            }
+
+            /* Mostrar una navegación parcial y ocultar el botón hamburger */
+            .hamburger-btn {
+                display: none; 
+            }
+            .full-nav {
+                display: flex; 
+                gap: 15px;
+            }
+            .full-nav a {
+                padding: 5px 10px;
+                border-radius: 4px;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+            
+            /* Posicionar Sidebar y Main Content */
+            .sidebar {
+                grid-column: 1; /* Primera columna */
+                order: 2; /* Sidebar se mantiene primero visualmente */
+                min-height: 400px;
+            }
+
+            .main-content {
+                grid-column: 2; /* Segunda columna */
+                order: 3;
+            }
+        }
+
+        /* ------------------------------------------- */
+        /* MEDIA QUERY: DESKTOP/LAPTOP (Mínimo 1024px) */
+        /* ------------------------------------------- */
+        @media (min-width: 1024px) {
+            /* Cambio de fondo para simular la transformación */
+            body {
+                background-color: #c8e6c9; /* Verde Pastel */
+            }
+
+            .layout-grid {
+                /* Layout de 3 columnas: Sidebar, Main y Ad */
+                grid-template-columns: 1fr 3fr 1fr; 
+            }
+
+            .header {
+                grid-column: 1 / -1; /* Mantiene 3 columnas de ancho */
+            }
+
+            /* La navegación completa está completamente visible */
+            .full-nav {
+                display: flex; 
+                gap: 20px;
+            }
+
+            /* Reposicionar elementos */
+            .sidebar {
+                grid-column: 1; /* Columna Izquierda */
+                order: initial;
+            }
+            .main-content {
+                grid-column: 2; /* Columna Central */
+                order: initial;
+            }
+            .ad-area {
+                display: block; /* Mostrar la columna extra */
+                grid-column: 3; /* Columna Derecha */
+                min-height: 400px;
+            }
+        }
+
+        /* Estilo para la columna que se añade en Desktop */
+        .ad-area {
+            display: none; /* Oculto por defecto (Móvil y Tablet) */
+            background-color: #fce4ec; /* Rosa claro */
+            color: #d81b60;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1 class="text-4xl font-bold p-4 max-w-7xl mx-auto">Transformación Responsiva</h1>
+    <p class="text-gray-700 p-4 max-w-7xl mx-auto mb-4">Redimensiona el ancho del área de previsualización para observar los 3 puntos de ruptura y la reestructuración del layout.</p>
+    
+    <div class="layout-grid">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <h2 class="text-xl font-bold">Logo & Título</h2>
+            
+            <!-- Menú Hamburger (Móvil) -->
+            <button class="hamburger-btn">☰</button>
+            
+            <!-- Navegación Completa (Desktop/Tablet) -->
+            <nav class="full-nav">
+                <a href="#" class="text-white hover:bg-white hover:text-cyan-600 transition">Inicio</a>
+                <a href="#" class="text-white hover:bg-white hover:text-cyan-600 transition">Acerca</a>
+                <a href="#" class="text-white hover:bg-white hover:text-cyan-600 transition">Contacto</a>
+            </nav>
+        </header>
+        
+        <!-- SIDEBAR -->
+        <aside class="content-box sidebar">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Sidebar</h3>
+            <p class="text-sm text-gray-600">Este contenido se apila verticalmente en móvil y se mueve a la izquierda en desktop.</p>
+            <ul class="list-disc list-inside mt-2 text-left text-gray-600">
+                <li>Opción 1</li>
+                <li>Opción 2</li>
+                <li>Opción 3</li>
+            </ul>
+        </aside>
+        
+        <!-- MAIN CONTENT -->
+        <main class="content-box main-content">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Contenido Principal</h3>
+            <p class="text-gray-700 text-left">Este es el área principal. Ocupa el mayor espacio en tablet y desktop. La disposición cambia de una columna a dos y luego a tres, ajustando automáticamente el ancho de los elementos.</p>
+            <p class="text-gray-700 text-left mt-3">El cambio de fondo del cuerpo (`body`) ilustra claramente cuando se activa cada `@media` query.</p>
+        </main>
+
+        <!-- AD AREA (Solo Visible en Desktop) -->
+        <div class="content-box ad-area">
+            <h3 class="text-lg font-bold mb-4">Área Adicional (Desktop)</h3>
+            <p class="text-sm">Esta columna se añade en pantallas grandes (min-width: 1024px) para ofrecer espacio para publicidad o contenido secundario extra.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
