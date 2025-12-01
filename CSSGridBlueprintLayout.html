@@ -146,5 +146,36 @@
         </div>
     </div>
 
+    <!-- ************************************************************************************ -->
+<!-- ************************ Indicador del ancho de pantalla *************************** -->
+<div id="screenWidthDisplay"></div>
+
+<style>
+  #screenWidthDisplay {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    z-index: 99999;
+    font-family: Arial, sans-serif;
+  }
+</style>
+
+<script>
+  function updateScreenWidth() {
+    const w = window.innerWidth;
+    document.getElementById("screenWidthDisplay").textContent = `${w}px`;
+  }
+
+  updateScreenWidth();
+  window.addEventListener("resize", updateScreenWidth);
+</script>
+<!-- ************************************************************************************ -->
+<!-- ************************************************************************************ -->
+
 </body>
 </html>
