@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradientes CSS Móvil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Aplicación de fuente Inter para mejor legibilidad */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8; /* Fondo suave para destacar los elementos con gradiente */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ---------------------------------------------------- */
+        /* GRADIENTE LINEAL HORIZONTAL PARA EL HEADER */
+        /* ---------------------------------------------------- */
+        .page-header {
+            width: 100%;
+            padding: 30px 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            /* Gradiente Lineal Horizontal: de naranja cálido a amarillo suave */
+            background: linear-gradient(to right, #ff7e5f, #feb47b); 
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* ---------------------------------------------------- */
+        /* GRADIENTE RADIAL CIRCULAR PARA EL BOTÓN */
+        /* ---------------------------------------------------- */
+        .centered-button {
+            margin-top: 40px;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px; /* Bordes muy redondeados */
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+            /* Gradiente Radial Circular: del centro (blanco) hacia afuera (naranja/amarillo) */
+            background: radial-gradient(circle at center, #ffffff 0%, #ffc0a1 80%, #ff9566 100%);
+            
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.5); /* Sombra que complementa el gradiente */
+        }
+
+        .centered-button:hover {
+            transform: translateY(-2px); /* Sugerencia de transición suave */
+            box-shadow: 0 8px 20px rgba(255, 126, 95, 0.7);
+        }
+
+        .content-section {
+            padding: 20px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .optimization-note {
+            margin-top: 30px;
+            background-color: #e6e6fa; /* Lavanda */
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #6a5acd;
+            color: #333;
+        }
+
+        /* Simulación de Contenedor Móvil */
+        .mobile-frame {
+            width: 100%;
+            max-width: 400px; /* Ancho típico de un dispositivo móvil */
+            margin: 20px auto;
+            border: 8px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        <header class="page-header">
+            <h1 class="header-title">App Móvil: Fondo con Gradiente Lineal</h1>
+            <p class="text-sm">Uso de CSS para reducir archivos de imagen.</p>
+        </header>
+
+        <div class="content-section bg-white pb-10">
+            <button class="centered-button">
+                Botón con Gradiente Radial
+            </button>
+            <p class="optimization-note">
+                **Optimización Móvil:** Los gradientes CSS reemplazan a menudo las imágenes de fondo, mejorando el tiempo de carga y la experiencia del usuario.
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
