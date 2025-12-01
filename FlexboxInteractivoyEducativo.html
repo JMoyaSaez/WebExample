@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama Interactivo de Flexbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos Base y Tipografía */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+        }
+
+        /* Estilo del Contenedor Flexbox (Azul) */
+        #flexContainer {
+            min-height: 400px;
+            width: 100%;
+            border: 4px solid #1e90ff; /* Azul dodger - Contenedor */
+            background-color: #e6f7ff; /* Fondo azul claro */
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 20px;
+            /* Propiedades Flexbox iniciales */
+            display: flex;
+            transition: all 0.5s ease;
+        }
+
+        /* Estilo de los Ítems (Verde) */
+        .flex-item {
+            width: 80px;
+            height: 80px;
+            background-color: #3cb371; /* Verde menta - Items */
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            flex-shrink: 0; /* Evita que los ítems se encojan en la orientación row */
+            margin: 5px; /* Pequeño margen para hacer visible el gap */
+        }
+        
+        /* Contenedor de Controles */
+        .controls-group {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        /* Estilos para los botones */
+        .control-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .control-btn:hover {
+            transform: translateY(-1px);
+        }
+        .control-btn.active {
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            background-color: #6a5acd; /* Púrpura */
+            color: white;
+        }
+
+        /* Código CSS Parcial Flotante */
+        .css-code-snippet {
+            position: sticky;
+            top: 20px;
+            background-color: #2e2e2e;
+            color: #4CAF50;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-width: 300px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ajuste para vista móvil */
+        @media (max-width: 640px) {
+            .controls-group {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .css-code-snippet {
+                position: static;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="lg:flex lg:justify-between">
+
+    <main class="lg:w-3/4">
+        <h1 class="text-3xl font-bold mb-4 text-gray-800">Flexbox Interactivo: Alineación y Distribución</h1>
+        <p class="text-gray-600 mb-6">Experimenta con las propiedades <code>justify-content</code> y <code>align-items</code> para ver cómo los elementos se ajustan dentro del contenedor flex.</p>
+
+        <!-- Controles de justify-content -->
+        <div class="controls-group">
+            <h2 class="text-xl font-semibold mb-2 text-gray-700">1. Distribución (<code>justify-content</code> - Eje Principal)</h2>
+            <div id="justifyControls">
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="flex-start">flex-start</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="flex-end">flex-end</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="center">center</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="space-between">space-between</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="space-around">space-around</button>
+            </div>
+        </div>
+
+        <!-- Controles de align-items -->
+        <div class="controls-group">
+            <h2 class="text-xl font-semibold mb-2 text-gray-700">2. Alineación (<code>align-items</code> - Eje Cruzado)</h2>
+            <div id="alignControls">
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="flex-start">flex-start</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="flex-end">flex-end</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="center">center</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="stretch">stretch</button>
+            </div>
+        </div>
+
+        <!-- Controles de flex-direction -->
+        <div class="controls-group">
+            <h2 class="text-xl font-semibold mb-2 text-gray-700">3. Dirección (<code>flex-direction</code>)</h2>
+            <div id="directionControls">
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="row">row</button>
+                <button class="control-btn bg-gray-200 text-gray-700" data-value="column">column</button>
+            </div>
+        </div>
+
+        <!-- Contenedor Flexbox -->
+        <div id="flexContainer">
+            <div class="flex-item">1</div>
+            <div class="flex-item">2</div>
+            <div class="flex-item">3</div>
+            <div class="flex-item">4</div>
+        </div>
+
+    </main>
+
+    <!-- Código CSS flotante -->
+    <aside class="lg:w-1/4 lg:ml-8">
+        <div class="css-code-snippet">
+            <h3 class="text-lg font-bold mb-2 text-white">CSS Actual</h3>
+            <pre id="cssSnippet">
+#flexContainer {
+    display: flex;
+    flex-direction: row; /* Predeterminado */
+    justify-content: flex-start; /* Predeterminado */
+    align-items: stretch; /* Predeterminado */
+}
+            </pre>
+        </div>
+    </aside>
+
+    <script>
+        const container = document.getElementById('flexContainer');
+        const cssSnippet = document.getElementById('cssSnippet');
+        const justifyControls = document.getElementById('justifyControls');
+        const alignControls = document.getElementById('alignControls');
+        const directionControls = document.getElementById('directionControls');
+
+        let currentJustify = 'flex-start';
+        let currentAlign = 'stretch';
+        let currentDirection = 'row';
+
+        // Función para actualizar el snippet de código CSS
+        function updateCssSnippet() {
+            cssSnippet.textContent = `
+#flexContainer {
+    display: flex;
+    flex-direction: ${currentDirection};
+    justify-content: ${currentJustify};
+    align-items: ${currentAlign};
+}`;
+        }
+
+        // Función para manejar el clic en los controles
+        function handleControlClick(event, property, controlsId) {
+            const target = event.target;
+            if (target.tagName === 'BUTTON') {
+                const value = target.getAttribute('data-value');
+                const controlsContainer = document.getElementById(controlsId);
+                
+                // Desactivar todos los botones en este grupo
+                controlsContainer.querySelectorAll('.control-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Activar el botón clicado
+                target.classList.add('active');
+
+                // Aplicar la propiedad
+                if (property === 'justifyContent') {
+                    container.style.justifyContent = value;
+                    currentJustify = value;
+                } else if (property === 'alignItems') {
+                    container.style.alignItems = value;
+                    currentAlign = value;
+                    
+                    // Si stretch está activo, los ítems deben tener height auto en column
+                    if (value === 'stretch' && currentDirection === 'column') {
+                        container.querySelectorAll('.flex-item').forEach(item => {
+                            item.style.height = 'auto';
+                        });
+                    } else {
+                         container.querySelectorAll('.flex-item').forEach(item => {
+                            item.style.height = '80px';
+                        });
+                    }
+                } else if (property === 'flexDirection') {
+                    container.style.flexDirection = value;
+                    currentDirection = value;
+                    
+                    // Ajustar la altura para que el stretch funcione en 'row' y no rompa 'column'
+                    container.querySelectorAll('.flex-item').forEach(item => {
+                        if (value === 'row' && currentAlign === 'stretch') {
+                            item.style.height = 'auto';
+                            item.style.width = '80px'; 
+                        } else if (value === 'row') {
+                            item.style.height = '80px';
+                            item.style.width = '80px';
+                        } else if (value === 'column' && currentAlign === 'stretch') {
+                            item.style.height = 'auto'; // Vuelven a ser auto
+                            item.style.width = '100px'; 
+                        } else {
+                            item.style.height = '80px';
+                            item.style.width = '80px';
+                        }
+                    });
+                }
+
+                updateCssSnippet();
+            }
+        }
+
+        // Asignar listeners a los controles
+        justifyControls.addEventListener('click', (e) => handleControlClick(e, 'justifyContent', 'justifyControls'));
+        alignControls.addEventListener('click', (e) => handleControlClick(e, 'alignItems', 'alignControls'));
+        directionControls.addEventListener('click', (e) => handleControlClick(e, 'flexDirection', 'directionControls'));
+        
+        // Inicializar el estado (simular clics en los valores predeterminados)
+        window.onload = () => {
+             // Configuración inicial de justify-content y align-items (para estilos por defecto)
+            justifyControls.querySelector('[data-value="flex-start"]').click();
+            alignControls.querySelector('[data-value="flex-start"]').click(); // Empezar con flex-start para mejor visualización
+            directionControls.querySelector('[data-value="row"]').click();
+            // Sobreescribir el align-items a stretch para el snippet (aunque lo aplicamos manual)
+            currentAlign = 'stretch';
+            updateCssSnippet();
+        };
+
+    </script>
+
+</body>
+</html>
