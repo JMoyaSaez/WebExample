@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Fetch desde GitHub Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #resultado {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f3f4f6;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Prueba de Fetch desde GitHub Pages</h1>
+  <button id="btn">Cargar datos</button>
+  <div id="resultado">Haz clic para cargar el JSON…</div>
+
+  <script>
+    document.getElementById("btn").addEventListener("click", () => {
+
+      // URL del JSON hospedado en TU GitHub Pages
+      const url = "https://jmoyasaez.github.io/WebExample/data.json";
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("resultado").textContent =
+            `Mensaje: ${data.mensaje} | Valor: ${data.valor} | Estado: ${data.estado}`;
+        })
+        .catch(err => {
+          document.getElementById("resultado").textContent = 
+            "Error cargando datos: " + err;
+        });
+    });
+  </script>
+
+</body>
+</html>
