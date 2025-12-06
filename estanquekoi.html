@@ -2,363 +2,260 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Koi Pond Background</title>
+  <title>Koi 3D Background</title>
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
-    html,
-    body {
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      /* Quitamos el fondo opaco del body */
-      background: transparent;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      background: #020617;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    /* Canvas ocupando toda la pantalla, como background */
-    #koi-pond {
+    /* El canvas WebGL ocupará toda la pantalla */
+    #bg {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       display: block;
-      /* z-index: -1;  <-- esto hacía que no se viera */
-      z-index: 0;
     }
   </style>
 </head>
 <body>
-  <canvas id="koi-pond"></canvas>
+  <!-- Three.js insertará aquí el canvas -->
+  <div id="bg"></div>
 
-  <script>
-    const canvas = document.getElementById("koi-pond");
-    const ctx = canvas.getContext("2d");
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.164.0/build/three.module.js";
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let dpr = window.devicePixelRatio || 1;
+    // ----- ESCENA BÁSICA -----
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x020617, 0.035);
 
-    function resize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      dpr = window.devicePixelRatio || 1;
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 15, 28);
+    camera.lookAt(0, 0, 0);
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = width + "px";
-      canvas.style.height = height + "px";
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x020617, 1);
+    document.getElementById("bg").appendChild(renderer.domElement);
 
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // ----- LUCES -----
+    const ambLight = new THREE.AmbientLight(0x91c4ff, 0.9);
+    scene.add(ambLight);
+
+    const dirLight = new THREE.DirectionalLight(0x7dd3fc, 0.8);
+    dirLight.position.set(20, 40, 10);
+    scene.add(dirLight);
+
+    const pointLight = new THREE.PointLight(0x38bdf8, 1.3, 80);
+    pointLight.position.set(0, 12, 0);
+    scene.add(pointLight);
+
+    // ----- "AGUA" (PLANO) -----
+    const waterGeo = new THREE.PlaneGeometry(80, 80, 64, 64);
+    const waterMat = new THREE.MeshPhongMaterial({
+      color: 0x02081b,
+      shininess: 80,
+      specular: new THREE.Color(0x3b82f6),
+      transparent: true,
+      opacity: 0.95,
+      side: THREE.DoubleSide,
+    });
+    const water = new THREE.Mesh(waterGeo, waterMat);
+    water.rotation.x = -Math.PI / 2;
+    scene.add(water);
+
+    // Pequeña deformación tipo ola
+    const waterVertices = water.geometry.attributes.position;
+    const waveOffsets = new Float32Array(waterVertices.count);
+    for (let i = 0; i < waterVertices.count; i++) {
+      waveOffsets[i] = Math.random() * Math.PI * 2;
     }
 
-    window.addEventListener("resize", resize);
-    resize();
+    // ----- GEOMETRÍA BASE DE LOS PECES (CUERPO + COLA) -----
+    const bodyGeo = new THREE.CapsuleGeometry(0.4, 1.6, 8, 16);
+    const tailGeo = new THREE.ConeGeometry(0.4, 0.9, 16);
 
-    const bubbles = [];
-    const BUBBLE_COUNT = 40;
+    // Paleta de colores "koi"
+    const colors = [0xf97316, 0xfbbf24, 0xfef3c7, 0xffedd5, 0xfee2e2];
 
-    function createBubble() {
+    function createKoi() {
+      const group = new THREE.Group();
+
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const bodyMat = new THREE.MeshPhongMaterial({
+        color,
+        shininess: 120,
+        specular: new THREE.Color(0xffffff),
+      });
+      const tailMat = new THREE.MeshPhongMaterial({
+        color,
+        shininess: 80,
+        specular: new THREE.Color(0xffffff),
+      });
+
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.castShadow = true;
+      body.receiveShadow = false;
+
+      const tail = new THREE.Mesh(tailGeo, tailMat);
+      tail.position.set(-1.1, 0, 0);
+      tail.rotation.z = Math.PI; // apuntar hacia atrás
+
+      group.add(body);
+      group.add(tail);
+
+      // Ojos sencillos
+      const eyeGeo = new THREE.SphereGeometry(0.07, 8, 8);
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+
+      const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+      eyeL.position.set(0.55, 0.18, 0.18);
+      const eyeR = eyeL.clone();
+      eyeR.position.z *= -1;
+
+      group.add(eyeL);
+      group.add(eyeR);
+
+      // Escala aleatoria
+      const s = 0.8 + Math.random() * 0.7;
+      group.scale.set(s, s, s);
+
+      scene.add(group);
+
       return {
-        x: Math.random() * width,
-        y: height + Math.random() * height,
-        radius: 3 + Math.random() * 8,
-        speed: 0.2 + Math.random() * 0.6,
-        alpha: 0.1 + Math.random() * 0.25,
+        mesh: group,
+        angle: Math.random() * Math.PI * 2,
+        radius: 6 + Math.random() * 12,
+        heightBase: 0.2 + Math.random() * 0.8,
+        heightAmp: 0.5 + Math.random() * 0.8,
+        speed: 0.2 + Math.random() * 0.5,
+        swayAmp: 0.2 + Math.random() * 0.4,
+        swayFreq: 1.5 + Math.random() * 1.5,
+        tailPhase: Math.random() * Math.PI * 2,
       };
     }
 
-    for (let i = 0; i < BUBBLE_COUNT; i++) {
-      bubbles.push(createBubble());
-    }
-
-    const koiColors = [
-      "#fef3c7",
-      "#fed7aa",
-      "#f97316",
-      "#fbbf24",
-      "#e5e7eb",
-    ];
-
-    class Koi {
-      constructor() {
-        const direction = Math.random() < 0.5 ? 1 : -1;
-
-        this.length = 60 + Math.random() * 80;
-        this.width = this.length * (0.28 + Math.random() * 0.12);
-        this.baseY = Math.random() * height;
-        this.x =
-          direction === 1 ? -this.length - Math.random() * width : width + this.length + Math.random() * width;
-        this.y = this.baseY;
-        this.speed = (0.3 + Math.random() * 0.5) * direction;
-        this.waveAmp = 18 + Math.random() * 24;
-        this.waveFreq = 0.0012 + Math.random() * 0.0018;
-        this.phase = Math.random() * Math.PI * 2;
-        this.color = koiColors[Math.floor(Math.random() * koiColors.length)];
-        this.spotsColor = "rgba(0,0,0,0.18)";
-        this.flip = direction === -1;
-      }
-
-      update(time) {
-        this.x += this.speed;
-        this.y =
-          this.baseY +
-          Math.sin(this.x * this.waveFreq + this.phase + time * 0.0004) * this.waveAmp;
-
-        if (this.speed > 0 && this.x - this.length > width + 100) {
-          this.reset(-1);
-        } else if (this.speed < 0 && this.x + this.length < -100) {
-          this.reset(1);
-        }
-      }
-
-      reset(direction) {
-        this.length = 60 + Math.random() * 80;
-        this.width = this.length * (0.28 + Math.random() * 0.12);
-        this.baseY = Math.random() * height;
-        this.y = this.baseY;
-        this.speed = (0.3 + Math.random() * 0.5) * direction;
-        this.waveAmp = 18 + Math.random() * 24;
-        this.waveFreq = 0.0012 + Math.random() * 0.0018;
-        this.phase = Math.random() * Math.PI * 2;
-        this.color = koiColors[Math.floor(Math.random() * koiColors.length)];
-        this.flip = direction === -1;
-        this.x =
-          direction === 1
-            ? -this.length - Math.random() * width
-            : width + this.length + Math.random() * width;
-      }
-
-      draw(ctx) {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        if (this.flip) ctx.scale(-1, 1);
-
-        const bodyLength = this.length;
-        const bodyWidth = this.width;
-
-        ctx.globalAlpha = 0.4;
-        ctx.fillStyle = "rgba(0,0,0,0.4)";
-        ctx.beginPath();
-        ctx.ellipse(
-          0,
-          bodyWidth * 0.15,
-          bodyLength * 0.55,
-          bodyWidth * 0.7,
-          0,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.globalAlpha = 1;
-
-        const grad = ctx.createLinearGradient(
-          -bodyLength / 2,
-          0,
-          bodyLength / 2,
-          0
-        );
-        grad.addColorStop(0, this.color);
-        grad.addColorStop(0.5, "#ffffff");
-        grad.addColorStop(1, this.color);
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.ellipse(
-          0,
-          0,
-          bodyLength / 2,
-          bodyWidth / 2,
-          0,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.moveTo(-bodyLength / 2, 0);
-        ctx.quadraticCurveTo(
-          -bodyLength * 0.75,
-          -bodyWidth * 0.8,
-          -bodyLength,
-          0
-        );
-        ctx.quadraticCurveTo(
-          -bodyLength * 0.75,
-          bodyWidth * 0.8,
-          -bodyLength / 2,
-          0
-        );
-        ctx.fill();
-
-        ctx.globalAlpha = 0.75;
-        ctx.beginPath();
-        ctx.moveTo(-bodyLength * 0.1, -bodyWidth * 0.1);
-        ctx.quadraticCurveTo(
-          bodyLength * 0.05,
-          -bodyWidth * 0.9,
-          bodyLength * 0.3,
-          -bodyWidth * 0.2
-        );
-        ctx.quadraticCurveTo(
-          bodyLength * 0.05,
-          -bodyWidth * 0.4,
-          -bodyLength * 0.1,
-          -bodyWidth * 0.1
-        );
-        ctx.fillStyle = "rgba(255,255,255,0.8)";
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(-bodyLength * 0.1, bodyWidth * 0.1);
-        ctx.quadraticCurveTo(
-          bodyLength * 0.05,
-          bodyWidth * 0.9,
-          bodyLength * 0.3,
-          bodyWidth * 0.2
-        );
-        ctx.quadraticCurveTo(
-          bodyLength * 0.05,
-          bodyWidth * 0.4,
-          -bodyLength * 0.1,
-          bodyWidth * 0.1
-        );
-        ctx.fill();
-        ctx.globalAlpha = 1;
-
-        ctx.fillStyle = this.spotsColor;
-        ctx.beginPath();
-        ctx.ellipse(
-          bodyLength * 0.1,
-          -bodyWidth * 0.15,
-          bodyLength * 0.18,
-          bodyWidth * 0.3,
-          0.3,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.ellipse(
-          -bodyLength * 0.1,
-          bodyWidth * 0.05,
-          bodyLength * 0.16,
-          bodyWidth * 0.25,
-          -0.4,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.ellipse(
-          bodyLength * 0.3,
-          0,
-          bodyLength * 0.18,
-          bodyWidth * 0.35,
-          0,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = "#111827";
-        ctx.beginPath();
-        ctx.arc(bodyLength * 0.38, -bodyWidth * 0.08, bodyWidth * 0.08, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-      }
-    }
-
-    const koiCount = 12;
+    const KOI_COUNT = 18;
     const koiList = [];
-    for (let i = 0; i < koiCount; i++) {
-      koiList.push(new Koi());
+    for (let i = 0; i < KOI_COUNT; i++) {
+      koiList.push(createKoi());
     }
 
-    let lastTime = 0;
+    // ----- PARTÍCULAS (BURBUJAS / POLVO EN EL AGUA) -----
+    const particleCount = 350;
+    const particleGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const speeds = new Float32Array(particleCount);
 
-    function drawBackground(time) {
-      const grad = ctx.createLinearGradient(0, 0, 0, height);
-      grad.addColorStop(0, "#020617");
-      grad.addColorStop(0.4, "#02061d");
-      grad.addColorStop(1, "#030712");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3 + 0] = (Math.random() - 0.5) * 40;
+      positions[i * 3 + 1] = Math.random() * 10;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+      speeds[i] = 0.005 + Math.random() * 0.02;
+    }
 
-      ctx.save();
-      ctx.globalAlpha = 0.1;
-      for (let i = 0; i < 3; i++) {
-        const gx = (Math.sin(time * 0.0002 + i) + 1) * 0.5 * width;
-        const gy = (Math.cos(time * 0.00025 + i * 2) + 1) * 0.5 * height;
-        const r = width * 0.7;
+    particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
-        const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, r);
-        g.addColorStop(0, "rgba(59,130,246,0.6)");
-        g.addColorStop(0.4, "rgba(56,189,248,0.35)");
-        g.addColorStop(1, "transparent");
+    const particleMat = new THREE.PointsMaterial({
+      color: 0x93c5fd,
+      size: 0.08,
+      transparent: true,
+      opacity: 0.6,
+      depthWrite: false,
+    });
 
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(gx, gy, r, 0, Math.PI * 2);
-        ctx.fill();
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    // ----- ANIMACIÓN -----
+    const clock = new THREE.Clock();
+
+    function animate() {
+      const t = clock.getElapsedTime();
+
+      // Deformar agua
+      for (let i = 0; i < waterVertices.count; i++) {
+        const x = waterVertices.getX(i);
+        const z = waterVertices.getZ(i);
+        const wave =
+          Math.sin(x * 0.25 + t * 1.2 + waveOffsets[i]) * 0.12 +
+          Math.cos(z * 0.3 + t * 0.8 + waveOffsets[i]) * 0.09;
+        waterVertices.setY(i, wave);
       }
-      ctx.restore();
-    }
+      waterVertices.needsUpdate = true;
+      water.geometry.computeVertexNormals();
 
-    function updateBubbles() {
-      for (const b of bubbles) {
-        b.y -= b.speed;
-        if (b.y + b.radius < -20) {
-          const idx = bubbles.indexOf(b);
-          bubbles[idx] = createBubble();
+      // Peces
+      koiList.forEach((k) => {
+        k.angle += k.speed * 0.02;
+
+        const x = Math.cos(k.angle) * k.radius;
+        const z = Math.sin(k.angle) * k.radius;
+        const y = k.heightBase + Math.sin(t * 0.8 + k.angle) * k.heightAmp;
+
+        k.mesh.position.set(x, y, z);
+
+        // Miran en dirección de avance
+        k.mesh.rotation.y = -k.angle + Math.PI / 2;
+
+        // Cabeceo suave
+        k.mesh.rotation.x = Math.sin(t * k.swayFreq + k.angle) * k.swayAmp;
+
+        // “Aleteo” de cola
+        const tail = k.mesh.children[1]; // body=0, tail=1
+        tail.rotation.y = Math.sin(t * 8 + k.tailPhase) * 0.6;
+      });
+
+      // Partículas subiendo
+      const pos = particles.geometry.attributes.position;
+      for (let i = 0; i < particleCount; i++) {
+        let y = pos.getY(i);
+        y += speeds[i];
+        if (y > 10) {
+          y = 0;
+          pos.setX(i, (Math.random() - 0.5) * 40);
+          pos.setZ(i, (Math.random() - 0.5) * 40);
         }
+        pos.setY(i, y);
       }
+      pos.needsUpdate = true;
+
+      // Luz que se mueve (efecto caústica suave)
+      pointLight.position.x = Math.sin(t * 0.5) * 10;
+      pointLight.position.z = Math.cos(t * 0.4) * 10;
+      pointLight.position.y = 12 + Math.sin(t * 0.7) * 2;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
     }
 
-    function drawBubbles() {
-      ctx.save();
-      for (const b of bubbles) {
-        ctx.globalAlpha = b.alpha;
-        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.radius);
-        g.addColorStop(0, "rgba(191,219,254,0.9)");
-        g.addColorStop(0.4, "rgba(191,219,254,0.4)");
-        g.addColorStop(1, "transparent");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-    }
+    animate();
 
-    function loop(time) {
-      const delta = time - lastTime;
-      lastTime = time;
-
-      drawBackground(time);
-      updateBubbles();
-      drawBubbles();
-
-      for (const koi of koiList) {
-        koi.update(time);
-        koi.draw(ctx);
-      }
-
-      requestAnimationFrame(loop);
-    }
-
-    requestAnimationFrame(loop);
+    // ----- RESIZE -----
+    window.addEventListener("resize", () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
   </script>
 </body>
 </html>
