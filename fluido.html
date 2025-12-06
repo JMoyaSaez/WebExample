@@ -1,1 +1,105 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fondo fluido con el ratón</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+<canvas id="fluid"></canvas>
+
+<script>
+  const canvas = document.getElementById("fluid");
+  const ctx = canvas.getContext("2d");
+
+  let width, height;
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  const mouse = {
+    x: width / 2,
+    y: height / 2,
+    px: width / 2,
+    py: height / 2,
+    down: false
+  };
+
+  window.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+
+  window.addEventListener("mousedown", () => mouse.down = true);
+  window.addEventListener("mouseup", () => mouse.down = false);
+
+  let hue = 0;
+
+  function draw() {
+    // “Borrado” suave para dejar estela (como fluido)
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    ctx.fillRect(0, 0, width, height);
+
+    // Dibujamos con aditivo para que los colores se mezclen bonito
+    ctx.globalCompositeOperation = "lighter";
+
+    const dx = mouse.x - mouse.px;
+    const dy = mouse.y - mouse.py;
+    const dist = Math.sqrt(dx*dx + dy*dy) + 0.001;
+
+    // Si el ratón se mueve, dibujamos varios “chorros” a lo largo del trazo
+    const steps = 8;
+    for (let i = 0; i < steps; i++) {
+      const t = i / steps;
+      const x = mouse.px + dx * t;
+      const y = mouse.py + dy * t;
+
+      const radius = 40 + dist * 0.8;
+      hue = (hue + 0.6) % 360;
+
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      grad.addColorStop(0, `hsla(${hue}, 80%, 60%, 0.9)`);
+      grad.addColorStop(1, `hsla(${(hue + 80)%360}, 80%, 30%, 0)`);
+
+      ctx.beginPath();
+      ctx.fillStyle = grad;
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    mouse.px = mouse.x;
+    mouse.py = mouse.y;
+
+    requestAnimationFrame(draw);
+  }
+
+  // Arrancamos con el lienzo un poco “vivo”
+  for (let i = 0; i < 50; i++) {
+    mouse.x = Math.random() * width;
+    mouse.y = Math.random() * height;
+    mouse.px = mouse.x + (Math.random() - 0.5) * 100;
+    mouse.py = mouse.y + (Math.random() - 0.5) * 100;
+  }
+  draw();
+</script>
+</body>
+</html>
