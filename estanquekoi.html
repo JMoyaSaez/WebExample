@@ -33,7 +33,7 @@
   <script type="module">
     import * as THREE from "https://unpkg.com/three@0.164.0/build/three.module.js";
 
-    // ----- ESCENA -----
+    // -------- ESCENA BÁSICA --------
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020617, 0.045);
 
@@ -52,7 +52,7 @@
     renderer.setClearColor(0x020617, 1);
     document.getElementById("bg").appendChild(renderer.domElement);
 
-    // ----- LUCES -----
+    // -------- LUCES --------
     const hemiLight = new THREE.HemisphereLight(0x7dd3fc, 0x020617, 0.8);
     scene.add(hemiLight);
 
@@ -64,8 +64,8 @@
     pointLight.position.set(0, 8, 0);
     scene.add(pointLight);
 
-    // ----- FONDO / SUELO DEL ESTANQUE -----
-    const bottomGeo = new THREE.PlaneGeometry(40, 40, 1, 1);
+    // -------- SUELO DEL ESTANQUE --------
+    const bottomGeo = new THREE.PlaneGeometry(40, 40);
     const bottomMat = new THREE.MeshPhongMaterial({
       color: 0x020617,
       shininess: 10,
@@ -76,17 +76,16 @@
     bottom.position.y = -7;
     scene.add(bottom);
 
-    // ----- PARTÍCULAS (POLVO EN EL AGUA) -----
+    // -------- PARTÍCULAS (POLVO EN EL AGUA) --------
     const particleCount = 400;
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const speeds = new Float32Array(particleCount);
-
     const BOUNDS = 10;
 
     for (let i = 0; i < particleCount; i++) {
       positions[i * 3 + 0] = (Math.random() - 0.5) * BOUNDS * 2;
-      positions[i * 3 + 1] = -7 + Math.random() * 12;
+      positions[i * 3 + 1] = -7 + Math.random() * 12; // entre fondo y zona media
       positions[i * 3 + 2] = (Math.random() - 0.5) * BOUNDS * 2;
       speeds[i] = 0.4 + Math.random() * 0.6;
     }
@@ -104,11 +103,11 @@
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // ----- CREAR UN PEZ KOI (SIMPLE PERO KOI) -----
+    // -------- CREAR UN PEZ KOI --------
     function createKoiMesh(primary, secondary) {
       const group = new THREE.Group();
 
-      // Cuerpo
+      // Cuerpo (esfera estirada)
       const bodyGeo = new THREE.SphereGeometry(0.5, 20, 20);
       const bodyMat = new THREE.MeshPhongMaterial({
         color: primary,
@@ -144,31 +143,6 @@
       tail.scale.set(1, 0.8, 0.4);
       group.add(tail);
 
-      // Aleta dorsal
-      const finGeo = new THREE.PlaneGeometry(0.6, 0.8);
-      const finMat = new THREE.MeshPhongMaterial({
-        color: primary,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.85,
-      });
-      const dorsal = new THREE.Mesh(finGeo, finMat);
-      dorsal.position.set(0, 0.4, 0);
-      dorsal.rotation.x = Math.PI / 2;
-      group.add(dorsal);
-
-      // Aletas pectorales
-      const pectoralL = new THREE.Mesh(finGeo, finMat.clone());
-      pectoralL.scale.set(0.7, 0.7, 0.7);
-      pectoralL.position.set(0.3, -0.1, 0.45);
-      pectoralL.rotation.y = Math.PI / 3;
-      pectoralL.rotation.x = Math.PI / 2.5;
-      group.add(pectoralL);
-
-      const pectoralR = pectoralL.clone();
-      pectoralR.position.z *= -1;
-      group.add(pectoralR); // <- AQUÍ ESTABA EL BUG ANTES
-
       // Ojos
       const eyeGeo = new THREE.SphereGeometry(0.06, 10, 10);
       const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
@@ -195,10 +169,10 @@
       spot2.position.set(-0.3, -0.03, -0.2);
       group.add(spot2);
 
-      // Que mire hacia +X
+      // Que "mire" hacia +X
       group.rotation.y = Math.PI / 2;
 
-      return { group, tail, dorsal, pectoralL, pectoralR };
+      return { group, tail };
     }
 
     const koiPalette = [
@@ -209,7 +183,7 @@
       { primary: 0xffffff, secondary: 0xf97316 },
     ];
 
-    // ----- CARDUMEN -----
+    // -------- CARDUMEN --------
     const koiList = [];
     const KOI_COUNT = 16;
 
@@ -243,15 +217,11 @@
         velocity,
         speed,
         tail: koiParts.tail,
-        dorsal: koiParts.dorsal,
-        pectoralL: koiParts.pectoralL,
-        pectoralR: koiParts.pector
-alR,
         wigglePhase: Math.random() * Math.PI * 2,
       });
     }
 
-    // ----- ANIMACIÓN -----
+    // -------- ANIMACIÓN --------
     const clock = new THREE.Clock();
 
     function animate() {
@@ -307,13 +277,6 @@ alR,
 
         const wiggle = Math.sin(t * 10 + k.wigglePhase) * 0.5;
         if (k.tail) k.tail.rotation.y = wiggle;
-
-        const flap = Math.sin(t * 6 + k.wigglePhase) * 0.25;
-        if (k.dorsal) k.dorsal.rotation.z = Math.sin(t * 4 + k.wigglePhase) * 0.15;
-        if (k.pectoralL && k.pectoralR) {
-          k.pectoralL.rotation.y = Math.PI / 3 + flap;
-          k.pectoralR.rotation.y = -Math.PI / 3 - flap;
-        }
       });
 
       pointLight.position.x = Math.sin(t * 0.4) * 6;
@@ -326,7 +289,7 @@ alR,
 
     animate();
 
-    // ----- RESIZE -----
+    // -------- RESIZE --------
     window.addEventListener("resize", () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
