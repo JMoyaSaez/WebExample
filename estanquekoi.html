@@ -35,7 +35,7 @@
 
     // ----- ESCENA -----
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x020617, 0.06);
+    scene.fog = new THREE.FogExp2(0x020617, 0.045);
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -64,7 +64,7 @@
     pointLight.position.set(0, 8, 0);
     scene.add(pointLight);
 
-    // ----- FONDO / "SUELO" DEL ESTANQUE -----
+    // ----- FONDO / SUELO DEL ESTANQUE -----
     const bottomGeo = new THREE.PlaneGeometry(40, 40, 1, 1);
     const bottomMat = new THREE.MeshPhongMaterial({
       color: 0x020617,
@@ -86,7 +86,7 @@
 
     for (let i = 0; i < particleCount; i++) {
       positions[i * 3 + 0] = (Math.random() - 0.5) * BOUNDS * 2;
-      positions[i * 3 + 1] = -7 + Math.random() * 12; // entre fondo y zona media
+      positions[i * 3 + 1] = -7 + Math.random() * 12;
       positions[i * 3 + 2] = (Math.random() - 0.5) * BOUNDS * 2;
       speeds[i] = 0.4 + Math.random() * 0.6;
     }
@@ -104,11 +104,11 @@
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // ----- CREAR UN PEZ KOI "DE VERDAD" (simplificado) -----
+    // ----- CREAR UN PEZ KOI (SIMPLE PERO KOI) -----
     function createKoiMesh(primary, secondary) {
       const group = new THREE.Group();
 
-      // Cuerpo (esfera estirada)
+      // Cuerpo
       const bodyGeo = new THREE.SphereGeometry(0.5, 20, 20);
       const bodyMat = new THREE.MeshPhongMaterial({
         color: primary,
@@ -116,8 +116,7 @@
         specular: new THREE.Color(0xffffff),
       });
       const body = new THREE.Mesh(bodyGeo, bodyMat);
-      body.scale.set(2.0, 0.9, 0.7); // largo, alto, ancho
-      body.position.set(0, 0, 0);
+      body.scale.set(2.0, 0.9, 0.7);
       group.add(body);
 
       // Cabeza
@@ -132,7 +131,7 @@
       head.scale.set(1, 0.9, 0.9);
       group.add(head);
 
-      // Cola (cono plano)
+      // Cola
       const tailGeo = new THREE.ConeGeometry(0.5, 1.2, 18);
       const tailMat = new THREE.MeshPhongMaterial({
         color: primary,
@@ -140,12 +139,12 @@
         specular: new THREE.Color(0xffffff),
       });
       const tail = new THREE.Mesh(tailGeo, tailMat);
-      tail.rotation.z = Math.PI / 2; // que "salga" en X
+      tail.rotation.z = Math.PI / 2;
       tail.position.set(-1.4, 0, 0);
       tail.scale.set(1, 0.8, 0.4);
       group.add(tail);
 
-      // Aleta dorsal (arriba)
+      // Aleta dorsal
       const finGeo = new THREE.PlaneGeometry(0.6, 0.8);
       const finMat = new THREE.MeshPhongMaterial({
         color: primary,
@@ -155,11 +154,10 @@
       });
       const dorsal = new THREE.Mesh(finGeo, finMat);
       dorsal.position.set(0, 0.4, 0);
-      dorsal.rotation.y = 0;
       dorsal.rotation.x = Math.PI / 2;
       group.add(dorsal);
 
-      // Aletas pectorales (laterales)
+      // Aletas pectorales
       const pectoralL = new THREE.Mesh(finGeo, finMat.clone());
       pectoralL.scale.set(0.7, 0.7, 0.7);
       pectoralL.position.set(0.3, -0.1, 0.45);
@@ -169,7 +167,7 @@
 
       const pectoralR = pectoralL.clone();
       pectoralR.position.z *= -1;
-      group.add(ectoralR);
+      group.add(pectoralR); // <- AQUÍ ESTABA EL BUG ANTES
 
       // Ojos
       const eyeGeo = new THREE.SphereGeometry(0.06, 10, 10);
@@ -181,7 +179,7 @@
       group.add(eyeL);
       group.add(eyeR);
 
-      // Ligeras manchas (koi pattern) – usando pequeños "parches"
+      // Manchas koi
       const spotGeo = new THREE.SphereGeometry(0.22, 10, 10);
       const spotMat = new THREE.MeshPhongMaterial({
         color: 0x000000,
@@ -197,7 +195,7 @@
       spot2.position.set(-0.3, -0.03, -0.2);
       group.add(spot2);
 
-      // Orientación base: "mira" hacia +X
+      // Que mire hacia +X
       group.rotation.y = Math.PI / 2;
 
       return { group, tail, dorsal, pectoralL, pectoralR };
@@ -211,7 +209,7 @@
       { primary: 0xffffff, secondary: 0xf97316 },
     ];
 
-    // ----- CREAR CARDUMEN -----
+    // ----- CARDUMEN -----
     const koiList = [];
     const KOI_COUNT = 16;
 
@@ -222,21 +220,19 @@
 
       const startPos = new THREE.Vector3(
         (Math.random() - 0.5) * BOUNDS * 1.5,
-        -4 + Math.random() * 6,  // entre fondo y zona media
+        -4 + Math.random() * 6,
         (Math.random() - 0.5) * BOUNDS * 1.5
       );
       mesh.position.copy(startPos);
 
-      // Velocidad inicial
       const dir = new THREE.Vector3(
         (Math.random() - 0.5),
         (Math.random() - 0.2),
         (Math.random() - 0.5)
       ).normalize();
-      const speed = 1.5 + Math.random(); // unidades/segundo
+      const speed = 1.5 + Math.random();
       const velocity = dir.multiplyScalar(speed);
 
-      // Pequeña variación de escala
       const s = 0.7 + Math.random() * 0.8;
       mesh.scale.set(s, s, s);
 
@@ -249,7 +245,8 @@
         tail: koiParts.tail,
         dorsal: koiParts.dorsal,
         pectoralL: koiParts.pectoralL,
-        pectoralR: koiParts.pectoralR,
+        pectoralR: koiParts.pector
+alR,
         wigglePhase: Math.random() * Math.PI * 2,
       });
     }
@@ -267,7 +264,7 @@
         let y = posAttr.getY(i);
         y += speeds[i] * delta;
         if (y > 5) {
-          y = -7 + Math.random() * 2; // respawn cerca del fondo
+          y = -7 + Math.random() * 2;
           posAttr.setX(i, (Math.random() - 0.5) * BOUNDS * 2);
           posAttr.setZ(i, (Math.random() - 0.5) * BOUNDS * 2);
         }
@@ -275,9 +272,8 @@
       }
       posAttr.needsUpdate = true;
 
-      // Peces moviéndose en volumen 3D
+      // Peces en volumen 3D
       koiList.forEach((k) => {
-        // Pequeña “intención” de movimiento curvo
         const noise = new THREE.Vector3(
           (Math.random() - 0.5) * 0.25 * delta,
           (Math.random() - 0.5) * 0.15 * delta,
@@ -286,13 +282,11 @@
         k.velocity.add(noise);
         k.velocity.normalize().multiplyScalar(k.speed);
 
-        // Actualizar posición
         k.mesh.position.addScaledVector(k.velocity, delta);
 
-        // Mantener dentro de una caja de agua
         const p = k.mesh.position;
         const limitX = BOUNDS;
-        const limitYTop = 4;   // cerca de la superficie
+        const limitYTop = 4;
         const limitYBottom = -7;
         const limitZ = BOUNDS;
 
@@ -306,30 +300,22 @@
           k.velocity.y *= -1;
         }
 
-        // Suavizar la orientación hacia la dirección de la velocidad
         const dir = k.velocity.clone().normalize();
         const targetPos = p.clone().add(dir);
         k.mesh.lookAt(targetPos);
-
-        // Ajuste para que el pez mire a lo largo del eje X
         k.mesh.rotation.y += Math.PI / 2;
 
-        // Movimiento de cola y aletas para dar vida
         const wiggle = Math.sin(t * 10 + k.wigglePhase) * 0.5;
-        if (k.tail) {
-          k.tail.rotation.y = wiggle;
-        }
-        if (k.dorsal) {
-          k.dorsal.rotation.z = Math.sin(t * 4 + k.wigglePhase) * 0.15;
-        }
+        if (k.tail) k.tail.rotation.y = wiggle;
+
+        const flap = Math.sin(t * 6 + k.wigglePhase) * 0.25;
+        if (k.dorsal) k.dorsal.rotation.z = Math.sin(t * 4 + k.wigglePhase) * 0.15;
         if (k.pectoralL && k.pectoralR) {
-          const flap = Math.sin(t * 6 + k.wigglePhase) * 0.25;
           k.pectoralL.rotation.y = Math.PI / 3 + flap;
           k.pectoralR.rotation.y = -Math.PI / 3 - flap;
         }
       });
 
-      // Luz que se mueve (sensación de caústicas)
       pointLight.position.x = Math.sin(t * 0.4) * 6;
       pointLight.position.z = Math.cos(t * 0.35) * 6;
       pointLight.position.y = 6 + Math.sin(t * 0.6) * 1.5;
