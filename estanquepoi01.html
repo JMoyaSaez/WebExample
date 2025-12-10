@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini Koi Pond</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 30% 20%, #1d3850, #020510 75%);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #fff;
+    }
+    canvas {
+      display: block;
+    }
+    .overlay {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      padding: .5rem .9rem;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
+      font-size: .85rem;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="pond"></canvas>
+  <div class="overlay">
+    HTML5 Canvas · Mini Koi Pond · mueve el ratón 🐟
+  </div>
+
+  <script>
+    const canvas = document.getElementById('pond');
+    const ctx = canvas.getContext('2d');
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    window.addEventListener('resize', () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    });
+
+    const mouse = { x: width / 2, y: height / 2, active: false };
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    });
+    window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+    });
+
+    class Koi {
+      constructor(x, y, speed, bodyLength, bodyWidth, colorPattern) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.bodyLength = bodyLength;
+        this.bodyWidth = bodyWidth;
+        this.angle = Math.random() * Math.PI * 2;
+        this.turnSpeed = 0.02 + Math.random() * 0.03;
+        this.waveOffset = Math.random() * Math.PI * 2;
+        this.colorPattern = colorPattern;
+      }
+
+      update(dt) {
+        // Ligera variación en la dirección
+        this.angle += (Math.random() - 0.5) * this.turnSpeed;
+
+        // Atracción suave hacia el ratón
+        if (mouse.active) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.hypot(dx, dy);
+          const influenceRadius = 250;
+          if (dist < influenceRadius) {
+            const targetAngle = Math.atan2(dy, dx);
+            let diff = targetAngle - this.angle;
+            // normalizar ángulo
+            while (diff > Math.PI) diff -= 2 * Math.PI;
+            while (diff < -Math.PI) diff += 2 * Math.PI;
+            this.angle += diff * 0.02; // girar un poco hacia el ratón
+          }
+        }
+
+        // Movimiento
+        const vx = Math.cos(this.angle) * this.speed * dt;
+        const vy = Math.sin(this.angle) * this.speed * dt;
+        this.x += vx;
+        this.y += vy;
+
+        // Mantener dentro del lienzo, girando hacia dentro
+        const margin = 80;
+        let steerX = 0, steerY = 0;
+
+        if (this.x < margin) steerX = 1;
+        else if (this.x > width - margin) steerX = -1;
+        if (this.y < margin) steerY = 1;
+        else if (this.y > height - margin) steerY = -1;
+
+        if (steerX !== 0 || steerY !== 0) {
+          const targetAngle = Math.atan2(steerY, steerX);
+          let diff = targetAngle - this.angle;
+          while (diff > Math.PI) diff -= 2 * Math.PI;
+          while (diff < -Math.PI) diff += 2 * Math.PI;
+          this.angle += diff * 0.04;
+        }
+
+        // Animación del aleteo (ondas en la cola)
+        this.waveOffset += dt * 0.008;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        const L = this.bodyLength;
+        const W = this.bodyWidth;
+
+        // cuerpo
+        const gradient = ctx.createLinearGradient(-L * 0.4, 0, L * 0.6, 0);
+        if (this.colorPattern === 'orange') {
+          gradient.addColorStop(0, '#fef6e7');
+          gradient.addColorStop(0.2, '#ffb347');
+          gradient.addColorStop(0.7, '#ff6f3c');
+          gradient.addColorStop(1, '#fef6e7');
+        } else if (this.colorPattern === 'white') {
+          gradient.addColorStop(0, '#fefefe');
+          gradient.addColorStop(0.5, '#e8f0ff');
+          gradient.addColorStop(1, '#fefefe');
+        } else { // tricolor simple
+          gradient.addColorStop(0, '#fefefe');
+          gradient.addColorStop(0.4, '#ff6f3c');
+          gradient.addColorStop(0.75, '#000000');
+          gradient.addColorStop(1, '#fefefe');
+        }
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        // cuerpo como cápsula
+        const r = W / 2;
+        ctx.moveTo(-L * 0.4, -r);
+        ctx.lineTo(L * 0.6, -r);
+        ctx.quadraticCurveTo(L * 0.7, 0, L * 0.6, r);
+        ctx.lineTo(-L * 0.4, r);
+        ctx.quadraticCurveTo(-L * 0.5, 0, -L * 0.4, -r);
+        ctx.closePath();
+        ctx.fill();
+
+        // cola ondulando
+        const tailWave = Math.sin(this.waveOffset * 4) * (W * 0.4);
+        ctx.beginPath();
+        ctx.moveTo(-L * 0.4, 0);
+        ctx.quadraticCurveTo(-L * 0.6, -W * 0.8, -L * 0.7, tailWave);
+        ctx.quadraticCurveTo(-L * 0.6, W * 0.8, -L * 0.4, 0);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.fill();
+
+        // aletas laterales
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.moveTo(-L * 0.1, 0);
+        ctx.quadraticCurveTo(0, -W * 1.0, L * 0.1, -W * 0.4);
+        ctx.quadraticCurveTo(0, -W * 0.6, -L * 0.1, 0);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(-L * 0.1, 0);
+        ctx.quadraticCurveTo(0, W * 1.0, L * 0.1, W * 0.4);
+        ctx.quadraticCurveTo(0, W * 0.6, -L * 0.1, 0);
+        ctx.fill();
+
+        // cabeza
+        ctx.beginPath();
+        ctx.arc(L * 0.55, 0, W * 0.6, -Math.PI / 2, Math.PI / 2);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 244, 220, 0.9)';
+        ctx.fill();
+
+        // ojo
+        ctx.beginPath();
+        ctx.arc(L * 0.6, -W * 0.2, W * 0.13, 0, Math.PI * 2);
+        ctx.fillStyle = '#111';
+        ctx.fill();
+
+        // brillo en el ojo
+        ctx.beginPath();
+        ctx.arc(L * 0.62, -W * 0.23, W * 0.05, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    const kois = [];
+    const patterns = ['orange', 'white', 'tricolor'];
+
+    function createKois(count) {
+      kois.length = 0;
+      for (let i = 0; i < count; i++) {
+        const L = 80 + Math.random() * 80;
+        const W = L * (0.25 + Math.random() * 0.1);
+        const speed = 0.05 + Math.random() * 0.07; // px/ms
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+        kois.push(new Koi(x, y, speed, L, W, pattern));
+      }
+    }
+
+    createKois(10);
+
+    let lastTime = performance.now();
+
+    function drawBackground() {
+      // leve degradado + "brillos" circulares como luces del agua
+      const gradient = ctx.createRadialGradient(
+        width * 0.3, height * 0.2, 0,
+        width * 0.3, height * 0.2, Math.max(width, height)
+      );
+      gradient.addColorStop(0, 'rgba(40, 80, 120, 0.9)');
+      gradient.addColorStop(1, 'rgba(2, 4, 12, 1)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.globalAlpha = 0.18;
+      for (let i = 0; i < 5; i++) {
+        const cx = (i * 203) % width;
+        const cy = (i * 157) % height;
+        const r = 120 + (i * 40);
+        const g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g2.addColorStop(0, 'rgba(255,255,255,0.4)');
+        g2.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function loop(now) {
+      const dt = now - lastTime;
+      lastTime = now;
+
+      drawBackground();
+
+      // leve desenfoque de movimiento “manual” pintando una capa transparente
+      ctx.fillStyle = 'rgba(0, 10, 25, 0.08)';
+      ctx.fillRect(0, 0, width, height);
+
+      for (const koi of kois) {
+        koi.update(dt);
+        koi.draw(ctx);
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
