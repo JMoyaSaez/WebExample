@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>WebGL — Triángulo básico</title>
+  <style>
+    body { margin: 0; background: #111; }
+    canvas { display: block; margin: auto; }
+  </style>
+</head>
+<body>
+
+<canvas id="glcanvas" width="600" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById("glcanvas");
+  const gl = canvas.getContext("webgl");
+
+  if (!gl) {
+    alert("Tu navegador no soporta WebGL");
+  }
+
+  // Vértices del triángulo
+  const vertices = new Float32Array([
+    0.0,  0.6,   // arriba
+   -0.6, -0.4,   // izquierda
+    0.6, -0.4    // derecha
+  ]);
+
+  const vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+  // SHADERS
+  const vsSource = `
+    attribute vec2 coordinates;
+    void main(void) {
+      gl_Position = vec4(coordinates, 0.0, 1.0);
+    }
+  `;
+
+  const fsSource = `
+    void main(void) {
+      gl_FragColor = vec4(0.1, 0.7, 1.0, 1.0);
+    }
+  `;
+
+  function compileShader(type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    return shader;
+  }
+
+  const vertexShader = compileShader(gl.VERTEX_SHADER, vsSource);
+  const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fsSource);
+
+  const shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+  gl.useProgram(shaderProgram);
+
+  const coord = gl.getAttribLocation(shaderProgram, "coordinates");
+  gl.vertexAttribPointer(coord, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(coord);
+
+  gl.clearColor(0.0, 0.0, 0.0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+</script>
+
+</body>
+</html>
