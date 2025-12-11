@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Three.js — Triángulo animado</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #111; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- Three.js desde unpkg (estable) -->
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+
+<script>
+  // Escena
+  const scene = new THREE.Scene();
+
+  // Cámara
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+  camera.position.z = 2; // alejamos un poco
+
+  // Render
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Geometría de triángulo (3 vértices en el plano XY)
+  const geometry = new THREE.BufferGeometry();
+  const vertices = new Float32Array([
+     0.0,  0.6, 0.0,  // arriba
+    -0.6, -0.4, 0.0,  // izquierda
+     0.6, -0.4, 0.0   // derecha
+  ]);
+  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+  geometry.computeVertexNormals(); // por si usamos luces
+
+  // Material
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xff6a2a,
+    side: THREE.DoubleSide
+  });
+
+  // Malla
+  const triangle = new THREE.Mesh(geometry, material);
+  scene.add(triangle);
+
+  // Animación
+  function animate() {
+    requestAnimationFrame(animate);
+
+    triangle.rotation.z += 0.01; // rota en plano 2D
+    triangle.rotation.y += 0.005; // ligera inclinación 3D para que se note
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Responsive
+  window.addEventListener('resize', () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+</script>
+
+</body>
+</html>
