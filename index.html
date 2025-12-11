@@ -1,175 +1,513 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WebExample — Presentación</title>
-  <meta name="description" content="Presentación de WebExample — ejemplo de sitio web por JMoyaSaez" />
+  <meta charset="UTF-8">
+  <title>WebExample · Playground de la asignatura</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-    :root{
-      --bg:#0f1724;
-      --card:#0b1220;
-      --muted:#94a3b8;
-      --accent:#7c3aed;
-      --glass: rgba(255,255,255,0.04);
-      --radius:12px;
-      color-scheme: dark;
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #1e293b;
+      --fg: #e5e7eb;
+      --fg-soft: #9ca3af;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
+      --card-bg: #020617;
+      --border: #1f2937;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: linear-gradient(180deg,#071021 0%, #07152a 40%, #071a33 100%);
-      color:#e6eef8;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      line-height:1.45;
-      padding:32px;
+
+    .light {
+      --bg: #f3f4f6;
+      --bg-soft: #e5e7eb;
+      --fg: #111827;
+      --fg-soft: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.06);
+      --card-bg: #ffffff;
+      --border: #d1d5db;
     }
-    .container{max-width:980px;margin:0 auto}
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:28px;
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .brand{
-      display:flex;align-items:center;gap:12px;
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1d4ed8 0, var(--bg) 45%);
+      color: var(--fg);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
     }
-    .logo{
-      width:56px;height:56px;border-radius:10px;
-      display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--accent),#4c1d95);
-      box-shadow:0 6px 18px rgba(124,58,237,0.18);
-      font-weight:700;
-      font-size:20px;
+
+    .page {
+      width: min(1100px, 100%);
+      background: linear-gradient(to bottom right, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+      border-radius: 24px;
+      padding: 20px 18px 22px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.8);
+      position: relative;
+      overflow: hidden;
     }
-    h1{font-size:28px;margin:0}
-    p.lead{color:var(--muted);margin:6px 0 0}
-    nav a{
-      color:var(--muted);
-      text-decoration:none;
-      margin-left:14px;
-      font-weight:600;
-      font-size:13px;
+
+    .light .page {
+      background: radial-gradient(circle at top left, #e0f2fe, #f3f4f6);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
     }
-    main{
-      display:grid;
-      grid-template-columns:1fr 360px;
-      gap:20px;
-      align-items:start;
+
+    .blur-orb {
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(56,189,248,0.22) 0, transparent 40%),
+        radial-gradient(circle at 90% 0%, rgba(129,140,248,0.18) 0, transparent 40%);
+      opacity: 0.7;
+      z-index: -1;
     }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius);
-      padding:20px;
-      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
-      border:1px solid rgba(255,255,255,0.03);
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
     }
-    .hero{
-      padding:28px;
-      border-radius:12px;
-      background:linear-gradient(180deg, rgba(124,58,237,0.08), var(--glass));
-      margin-bottom:16px;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .hero h2{margin:0 0 8px;font-size:22px}
-    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
-    .feature{
-      background:rgba(255,255,255,0.02);
-      padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: conic-gradient(from 210deg, #38bdf8, #6366f1, #22c55e, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px rgba(15,23,42,0.8);
     }
-    .meta{color:var(--muted);font-size:14px}
-    .right .meta small{display:block;margin-top:8px;color:var(--muted)}
-    footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
-    .btn{
-      display:inline-block;padding:10px 14px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:600;
-      box-shadow:0 6px 18px rgba(124,58,237,0.18);
+
+    .logo span {
+      font-weight: 700;
+      font-size: 18px;
+      color: #0b1220;
     }
-    a.ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted);padding:8px 12px;border-radius:10px;text-decoration:none}
-    @media (max-width:960px){
-      main{grid-template-columns:1fr; padding-bottom:20px}
-      .right{order:2}
+
+    .titles h1 {
+      font-size: 1.35rem;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+
+    .titles p {
+      font-size: 0.85rem;
+      color: var(--fg-soft);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.5);
+      border: 1px solid rgba(148,163,184,0.3);
+      color: var(--fg-soft);
+    }
+
+    .light .tag {
+      background: #e5e7eb;
+      border-color: #cbd5f5;
+    }
+
+    .theme-toggle {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15,23,42,0.7);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--fg-soft);
+      cursor: pointer;
+    }
+
+    .light .theme-toggle {
+      background: rgba(255,255,255,0.7);
+      border-color: #cbd5f5;
+    }
+
+    .theme-pill {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 25% 25%, #fee2e2 0, #0f172a 45%, #020617 100%);
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+    }
+
+    .light .theme-pill {
+      background: radial-gradient(circle at 25% 25%, #f59e0b 0, #fef9c3 40%, #fefce8 100%);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .intro {
+      position: relative;
+      padding-right: 6px;
+    }
+
+    .intro h2 {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .intro p {
+      font-size: 0.9rem;
+      color: var(--fg-soft);
+      line-height: 1.4;
+    }
+
+    .intro ul {
+      margin-top: 10px;
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--fg-soft);
+    }
+
+    .intro li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .intro li span {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .highlight-box {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: linear-gradient(to right, rgba(56,189,248,0.08), rgba(129,140,248,0.06));
+      border: 1px solid rgba(148,163,184,0.4);
+      font-size: 0.82rem;
+      color: var(--fg);
+    }
+
+    .light .highlight-box {
+      background: linear-gradient(to right, rgba(59,130,246,0.06), rgba(16,185,129,0.06));
+    }
+
+    .highlight-box strong {
+      color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      position: relative;
+      border-radius: 16px;
+      padding: 12px 12px 11px;
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.16), var(--card-bg));
+      border: 1px solid rgba(148, 163, 184, 0.38);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 4px;
+    }
+
+    .light .card {
+      background: linear-gradient(to bottom right, #ffffff, #f1f5f9);
+      border-color: #cbd5f5;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.65);
+      border-color: var(--accent);
+    }
+
+    .card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      white-space: nowrap;
+    }
+
+    .card p {
+      font-size: 0.8rem;
+      color: var(--fg-soft);
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--fg-soft);
+      margin-top: 3px;
+    }
+
+    .meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.16);
+    }
+
+    footer {
+      margin-top: 14px;
+      font-size: 0.72rem;
+      color: var(--fg-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="page">
+    <div class="blur-orb"></div>
+
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true">W</div>
-        <div>
-          <h1>WebExample</h1>
-          <p class="lead">Ejemplo de presentación — creado por JMoyaSaez</p>
+        <div class="logo">
+          <span>W</span>
+        </div>
+        <div class="titles">
+          <h1>WebExample · Playground</h1>
+          <p>Ejemplos de HTML5, CSS3, JavaScript y Frameworks para la asignatura</p>
+          <div class="tags">
+            <span class="tag">HTML5</span>
+            <span class="tag">CSS3 · Bootstrap · Tailwind</span>
+            <span class="tag">JavaScript · APIs</span>
+          </div>
         </div>
       </div>
-      <nav>
-        <a href="#about">Acerca</a>
-        <a href="#features">Características</a>
-        <a href="#contact">Contacto</a>
-        <a class="ghost" href="https://github.com/JMoyaSaez/WebExample" target="_blank" rel="noopener">GitHub</a>
-      </nav>
+
+      <button class="theme-toggle" id="themeToggle" type="button">
+        <div class="theme-pill" id="themeIcon">☾</div>
+        <span id="themeLabel">Modo oscuro</span>
+      </button>
     </header>
 
     <main>
-      <section class="card">
-        <div class="hero">
-          <h2>Bienvenido a WebExample</h2>
-          <p class="meta">Esta página es una plantilla simple y moderna para presentar tu proyecto. Fácil de editar y lista para publicar.</p>
-          <p style="margin-top:14px;">
-            <a class="btn" href="#about">Conocer más</a>
-          </p>
+      <section class="intro">
+        <h2>¿Qué encontrarás aquí?</h2>
+        <p>
+          Esta página recoge los mini proyectos y ejemplos que vamos creando en clase:
+          pruebas de diseño responsivo, juegos en JavaScript, APIs, multimedia y experimentos con frameworks.
+        </p>
+
+        <ul>
+          <li><span></span><div>Explora cada ejemplo, revisa el código y haz tus propias variantes.</div></li>
+          <li><span></span><div>Ideal para practicar de cara a ejercicios, entregas y exámenes.</div></li>
+          <li><span></span><div>Puedes clonar este repositorio y usarlo como base para tus propios proyectos.</div></li>
+        </ul>
+
+        <div class="highlight-box">
+          <strong>Consejo:</strong> abre cada demo, inspecciona el código con las herramientas del navegador
+          y prueba a romper/cambiar cosas. La mejor forma de aprender es experimentar.
         </div>
-
-        <article id="about" style="margin-top:6px;">
-          <h3>Acerca del proyecto</h3>
-          <p class="meta">WebExample es un repositorio de demostración pensado para mostrar una estructura mínima pero estética: una página de presentación, secciones de características y un pie de contacto.</p>
-
-          <h4 id="features" style="margin-top:16px;">Características</h4>
-          <div class="features" role="list">
-            <div class="feature" role="listitem">
-              <strong>Responsive</strong>
-              <div class="meta">Se adapta a móviles, tablet y escritorio.</div>
-            </div>
-            <div class="feature" role="listitem">
-              <strong>Fácil edición</strong>
-              <div class="meta">HTML y CSS inline para cambios rápidos.</div>
-            </div>
-            <div class="feature" role="listitem">
-              <strong>Ligero</strong>
-              <div class="meta">Sin frameworks externos por defecto.</div>
-            </div>
-            <div class="feature" role="listitem">
-              <strong>Listo para GitHub Pages</strong>
-              <div class="meta">Sólo sube index.html al branch principal.</div>
-            </div>
-          </div>
-        </article>
-
-        <article id="contact" style="margin-top:18px;">
-          <h4>Contacto</h4>
-          <p class="meta">Autor: JMoyaSaez — <a href="https://github.com/JMoyaSaez" target="_blank" style="color:var(--accent);text-decoration:none">github.com/JMoyaSaez</a></p>
-          <p class="meta" style="margin-top:8px">¿Quieres que lo suba al repositorio por ti? Pídeme que haga el commit y lo empuje.</p>
-        </article>
       </section>
 
-      <aside class="card right">
-        <h3>Detalles rápidos</h3>
-        <p class="meta"><strong>Repositorio:</strong><br>JMoyaSaez/WebExample</p>
-        <p class="meta"><strong>Tecnologías:</strong><br>HTML, CSS</p>
-        <p class="meta"><small>Instrucciones:</small> Coloca este archivo como "index.html" en la raíz del repositorio para que GitHub Pages lo sirva automáticamente (si está habilitado).</p>
-        <div style="margin-top:14px;">
-          <a class="btn" href="https://github.com/JMoyaSaez/WebExample/new/main?filename=index.html" target="_blank" rel="noopener">Crear en GitHub</a>
-          <a style="margin-left:8px" class="ghost" href="https://github.com/JMoyaSaez/WebExample" target="_blank" rel="noopener">Ir al repo</a>
-        </div>
-      </aside>
+      <section class="grid">
+        <!-- TV HTML5 + YouTube -->
+        <a class="card" href="TV.html">
+          <div class="card-topline">
+            <h3>TV HTML5 + YouTube</h3>
+            <span class="pill">Multimedia + JS</span>
+          </div>
+          <p>Tele interactiva con controles personalizados (play, pausa, mute) para un vídeo de YouTube.</p>
+          <div class="meta">
+            <span><span class="dot"></span>HTML5 · JS · API YouTube</span>
+            <span>Nivel: medio</span>
+          </div>
+        </a>
+
+        <!-- Puzzle Drag & Drop -->
+        <a class="card" href="puzzle.html">
+          <div class="card-topline">
+            <h3>Puzzle Drag & Drop</h3>
+            <span class="pill">Interacción</span>
+          </div>
+          <p>Puzzle con arrastrar y soltar, contador de tiempo y lógica de juego con JavaScript.</p>
+          <div class="meta">
+            <span><span class="dot"></span>Drag & Drop · DOM</span>
+            <span>Nivel: medio</span>
+          </div>
+        </a>
+
+        <!-- Fetch / AJAX -->
+        <a class="card" href="fetch-test.html">
+          <div class="card-topline">
+            <h3>Fetch / AJAX desde GitHub</h3>
+            <span class="pill">APIs</span>
+          </div>
+          <p>Ejemplo de carga de datos JSON desde el propio repositorio usando <code>fetch()</code>.</p>
+          <div class="meta">
+            <span><span class="dot"></span>AJAX moderno</span>
+            <span>Nivel: medio</span>
+          </div>
+        </a>
+
+        <!-- Bootstrap Responsivo -->
+        <a class="card" href="bootstrap-responsivo.html">
+          <div class="card-topline">
+            <h3>Tarjetas con Bootstrap</h3>
+            <span class="pill">Bootstrap</span>
+          </div>
+          <p>Tarjetas responsivas usando el sistema de grid y clases utilitarias de Bootstrap.</p>
+          <div class="meta">
+            <span><span class="dot"></span>Grid · Responsivo</span>
+            <span>Nivel: básico</span>
+          </div>
+        </a>
+
+        <!-- Tailwind Card -->
+        <a class="card" href="tailwind-card.html">
+          <div class="card-topline">
+            <h3>Tarjeta Tailwind</h3>
+            <span class="pill">Tailwind CSS</span>
+          </div>
+          <p>De tarjeta simple a tarjeta moderna utilizando solo clases utilitarias de Tailwind.</p>
+          <div class="meta">
+            <span><span class="dot"></span>Utility-first</span>
+            <span>Nivel: básico</span>
+          </div>
+        </a>
+
+        <!-- Otros / futuro -->
+        <a class="card" href="TV.html#todo" onclick="alert('Puedes enlazar aquí tu próximo experimento: canvas, juegos, SPA, etc.'); return false;">
+          <div class="card-topline">
+            <h3>Próximos experimentos</h3>
+            <span class="pill">Work in progress</span>
+          </div>
+          <p>Reserva este espacio para nuevos proyectos: canvas, juegos, SPA, dashboards, etc.</p>
+          <div class="meta">
+            <span><span class="dot"></span>En construcción</span>
+            <span>Explora y amplía</span>
+          </div>
+        </a>
+      </section>
     </main>
 
     <footer>
-      <div>© <strong>WebExample</strong> — JMoyaSaez</div>
-      <div class="meta">Plantilla generada — lista para personalizar</div>
+      <span>Repositorio: <a href="https://github.com/JMoyaSaez/WebExample" target="_blank">JMoyaSaez/WebExample</a></span>
+      <span>Pensado para la asignatura · HTML5 · CSS3 · JavaScript · Frameworks</span>
     </footer>
   </div>
+
+  <script>
+    (function () {
+      const body = document.body;
+      const toggle = document.getElementById('themeToggle');
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+
+      // tema por defecto: oscuro
+      let current = localStorage.getItem('webexample-theme') || 'dark';
+      if (current === 'light') {
+        body.classList.add('light');
+        icon.textContent = '☀';
+        label.textContent = 'Modo claro';
+      } else {
+        icon.textContent = '☾';
+        label.textContent = 'Modo oscuro';
+      }
+
+      toggle.addEventListener('click', () => {
+        body.classList.toggle('light');
+        const isLight = body.classList.contains('light');
+        if (isLight) {
+          icon.textContent = '☀';
+          label.textContent = 'Modo claro';
+          localStorage.setItem('webexample-theme', 'light');
+        } else {
+          icon.textContent = '☾';
+          label.textContent = 'Modo oscuro';
+          localStorage.setItem('webexample-theme', 'dark');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
