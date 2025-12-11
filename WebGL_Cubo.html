@@ -2,17 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Three.js — Cubo 3D simple</title>
+  <title>Three.js Cubo</title>
   <style>
     body { margin: 0; overflow: hidden; background: #111; }
   </style>
 </head>
 <body>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+<!-- CDN compatible con GitHub Pages -->
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
 
 <script>
-  // Escena
+  // Crear escena
   const scene = new THREE.Scene();
 
   // Cámara
@@ -40,16 +41,13 @@
   // Animación
   function animate() {
     requestAnimationFrame(animate);
-
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
-
     renderer.render(scene, camera);
   }
-
   animate();
 
-  // Responsive
+  // Ajustar ventana
   window.addEventListener("resize", () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
