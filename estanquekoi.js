@@ -1,224 +1,100 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-const errBox = document.getElementById("err");
-function showError(e){
-  errBox.hidden = false;
-  errBox.textContent =
-`ERROR:
-${e?.message || e}
+// ---------- Renderer ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
 
-TIP:
-- Abre DevTools > Console y copia el primer error.
-- Revisa que existen /css/estanquekoi.css y /js/estanquekoi.js en el repo.
-`;
-  console.error(e);
-}
+// ---------- Scene / Camera ----------
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 100);
+camera.position.z = 14;
 
-try{
-  // Renderer
-  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  document.body.appendChild(renderer.domElement);
+// ---------- Background shader ----------
+const bgGeo = new THREE.PlaneGeometry(2, 2);
+const bgMat = new THREE.ShaderMaterial({
+  depthWrite: false,
+  uniforms: {
+    uTime: { value: 0 }
+  },
+  vertexShader: `
+    void main(){
+      gl_Position = vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
 
-  // Scene / Camera
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x05070a, 0.03);
-
-  const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 200);
-  camera.position.set(0, 6, 16);
-
-  // Controls
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.06;
-  controls.target.set(0, 2.2, 0);
-  controls.minDistance = 6;
-  controls.maxDistance = 40;
-  controls.maxPolarAngle = Math.PI * 0.49;
-
-  // Lights
-  scene.add(new THREE.AmbientLight(0x6aa6ff, 0.25));
-  const key = new THREE.DirectionalLight(0xffffff, 1.1);
-  key.position.set(8, 14, 6);
-  scene.add(key);
-  const rim = new THREE.DirectionalLight(0x7dd3ff, 0.6);
-  rim.position.set(-10, 8, -12);
-  scene.add(rim);
-
-  // Water (shader plane)
-  const waterGeo = new THREE.PlaneGeometry(120, 120, 200, 200);
-  const waterMat = new THREE.ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0,0) },
-      uColorDeep: { value: new THREE.Color("#04070c") },
-      uColorShallow: { value: new THREE.Color("#0b2436") }
-    },
-    vertexShader: `
-      uniform float uTime;
-      uniform vec2 uMouse;
-      varying vec2 vUv;
-      varying float vWave;
-      void main(){
-        vUv = uv;
-        vec3 pos = position;
-        float w1 = sin(pos.x * 0.25 + uTime*0.9) * 0.18;
-        float w2 = cos(pos.y * 0.28 + uTime*0.7) * 0.14;
-        float w3 = sin((pos.x+pos.y) * 0.18 + uTime*1.1) * 0.10;
-        float d = distance(vec2(pos.x, pos.y)*0.03, uMouse);
-        float splash = exp(-d*6.0) * sin(uTime*3.0 - d*10.0) * 0.25;
-        float wave = w1 + w2 + w3 + splash;
-        pos.z += wave;
-        vWave = wave;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform float uTime;
-      uniform vec3 uColorDeep;
-      uniform vec3 uColorShallow;
-      varying vec2 vUv;
-      varying float vWave;
-      void main(){
-        float depth = smoothstep(0.0, 1.0, vUv.y);
-        vec3 col = mix(uColorDeep, uColorShallow, depth);
-        float glint = pow(0.5 + 0.5*sin((vUv.x*18.0 + uTime*0.8) + vWave*6.0), 18.0) * 0.25;
-        col += glint;
-        float caust = sin((vUv.x*40.0 + uTime*1.2)) * sin((vUv.y*32.0 - uTime*1.0));
-        col += caust*0.02;
-        gl_FragColor = vec4(col, 1.0);
-      }
-    `
-  });
-
-  const water = new THREE.Mesh(waterGeo, waterMat);
-  water.rotation.x = -Math.PI/2;
-  water.position.y = 0;
-  scene.add(water);
-
-  // Koi (procedural)
-  const koi = new THREE.Group();
-  koi.position.set(0, 1.2, 0);
-  scene.add(koi);
-
-  const bodyGeo = new THREE.CapsuleGeometry(0.55, 2.6, 10, 20);
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xfff6e8, roughness: 0.55 });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.rotation.z = Math.PI/2;
-  koi.add(body);
-
-  const spotsGeo = new THREE.CapsuleGeometry(0.56, 2.58, 10, 20);
-  const spotsMat = new THREE.MeshStandardMaterial({
-    color: 0xff6a3d, roughness: 0.62, transparent:true, opacity:0.55
-  });
-  const spots = new THREE.Mesh(spotsGeo, spotsMat);
-  spots.rotation.z = Math.PI/2;
-  spots.scale.set(1, 1, 0.92);
-  spots.position.y = 0.03;
-  koi.add(spots);
-
-  const tailGeo = new THREE.ConeGeometry(0.45, 1.3, 16, 1, true);
-  const tailMat = new THREE.MeshStandardMaterial({ color: 0xfff6e8, roughness: 0.6 });
-  const tail = new THREE.Mesh(tailGeo, tailMat);
-  tail.rotation.z = -Math.PI/2;
-  tail.position.set(-2.2, 0, 0);
-  koi.add(tail);
-
-  const finGeo = new THREE.PlaneGeometry(0.9, 0.5);
-  const finMat = new THREE.MeshStandardMaterial({
-    color: 0xfff6e8, roughness:0.7, side:THREE.DoubleSide, transparent:true, opacity:0.75
-  });
-  const finL = new THREE.Mesh(finGeo, finMat);
-  finL.position.set(0.3, -0.15, 0.65);
-  finL.rotation.set(0.0, 0.2, 0.3);
-  koi.add(finL);
-
-  const finR = finL.clone();
-  finR.position.z = -0.65;
-  finR.rotation.set(0.0, -0.2, -0.3);
-  koi.add(finR);
-
-  // Mouse to water
-  const mouseNDC = new THREE.Vector2(0,0);
-  const ray = new THREE.Raycaster();
-  const planeY = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
-
-  window.addEventListener("pointermove", (e)=>{
-    mouseNDC.x = (e.clientX / innerWidth) * 2 - 1;
-    mouseNDC.y = -(e.clientY / innerHeight) * 2 + 1;
-  });
-
-  function updateMouseOnWater(){
-    ray.setFromCamera(mouseNDC, camera);
-    const hit = new THREE.Vector3();
-    ray.ray.intersectPlane(planeY, hit);
-    waterMat.uniforms.uMouse.value.set(hit.x*0.03, hit.z*0.03);
-    return hit;
-  }
-
-  // Animate + FPS
-  const clock = new THREE.Clock();
-  let frames = 0, tAcc = 0;
-  const fpsEl = document.getElementById("fps");
-
-  function loop(){
-    requestAnimationFrame(loop);
-    const dt = clock.getDelta();
-    const t = clock.elapsedTime;
-
-    controls.update();
-    waterMat.uniforms.uTime.value = t;
-    const mouseWorld = updateMouseOnWater();
-
-    // base path (∞) + suavizado hacia mouse
-    const a = 6.5;
-    const s = t * 0.35;
-    const x = a * Math.sin(s);
-    const z = a * Math.sin(s) * Math.cos(s);
-    const y = 1.25 + Math.sin(t*1.1)*0.12;
-
-    const attract = 0.12;
-    const tx = THREE.MathUtils.lerp(x, mouseWorld.x, attract);
-    const tz = THREE.MathUtils.lerp(z, mouseWorld.z, attract);
-    koi.position.set(tx, y, tz);
-
-    const nextS = s + 0.06;
-    const nx = a * Math.sin(nextS);
-    const nz = a * Math.sin(nextS) * Math.cos(nextS);
-    const target = new THREE.Vector3(
-      THREE.MathUtils.lerp(nx, mouseWorld.x, attract),
-      1.25,
-      THREE.MathUtils.lerp(nz, mouseWorld.z, attract)
-    );
-    koi.lookAt(target);
-
-    const wiggle = Math.sin(t*6.0) * 0.25;
-    tail.rotation.y = wiggle;
-    body.rotation.y = wiggle * 0.35;
-    spots.rotation.y = wiggle * 0.35;
-    finL.rotation.z = 0.3 + Math.sin(t*10.0) * 0.25;
-    finR.rotation.z = -0.3 - Math.sin(t*10.0) * 0.25;
-
-    frames++; tAcc += dt;
-    if(tAcc >= 0.5){
-      fpsEl.textContent = `FPS: ${Math.round(frames / tAcc)}`;
-      frames = 0; tAcc = 0;
+    float noise(vec2 p){
+      return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453);
     }
 
-    renderer.render(scene, camera);
-  }
+    void main(){
+      vec2 uv = gl_FragCoord.xy / vec2( window.innerWidth, window.innerHeight );
+      vec2 p = uv * 2.0 - 1.0;
 
-  window.addEventListener("resize", ()=>{
-    renderer.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth/innerHeight;
-    camera.updateProjectionMatrix();
-  });
+      float n = noise(p * 4.0 + uTime * 0.05);
+      float glow = exp(-length(p) * 1.6);
 
-  loop();
+      vec3 col = vec3(0.02,0.03,0.06)
+               + vec3(0.5,0.1,0.2) * glow * 0.4
+               + n * 0.03;
 
-}catch(e){
-  showError(e);
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `
+});
+const bg = new THREE.Mesh(bgGeo, bgMat);
+bg.frustumCulled = false;
+scene.add(bg);
+
+// ---------- Koi (entity style) ----------
+const koi = new THREE.Group();
+scene.add(koi);
+
+// cuerpo simple (iog-style)
+const bodyGeo = new THREE.PlaneGeometry(2.4, 0.9);
+const bodyMat = new THREE.MeshBasicMaterial({
+  color: 0xff4a4a,
+  transparent: true,
+  opacity: 0.9
+});
+const body = new THREE.Mesh(bodyGeo, bodyMat);
+koi.add(body);
+
+// cola
+const tailGeo = new THREE.PlaneGeometry(1.1, 0.6);
+const tail = new THREE.Mesh(tailGeo, bodyMat);
+tail.position.x = -1.6;
+koi.add(tail);
+
+// ---------- Movimiento ----------
+const clock = new THREE.Clock();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.elapsedTime;
+
+  bgMat.uniforms.uTime.value = t;
+
+  // movimiento tipo iog
+  koi.position.x = Math.sin(t * 0.25) * 6;
+  koi.position.y = Math.cos(t * 0.33) * 3;
+  koi.rotation.z = Math.sin(t * 1.8) * 0.2;
+
+  // ondulación
+  tail.rotation.z = Math.sin(t * 6) * 0.5;
+
+  renderer.render(scene, camera);
 }
+
+animate();
+
+// ---------- Resize ----------
+window.addEventListener("resize", () => {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+});
