@@ -1,30 +1,27 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Estanque Koi (WebGL) — One Fish</title>
-  <link rel="stylesheet" href="./estanquekoi.css" />
+  <meta charset="utf-8">
+  <title>Estanque Koi · WebGL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="estanquekoi.css">
 </head>
 <body>
-  <div id="hud">
-    <b>Estanque Koi — WebGL</b><br/>
-    Mouse: atrae el koi · Rueda: zoom<br/>
-    <span id="fps">FPS: —</span>
-  </div>
 
-  <div id="err" hidden></div>
+<div id="hud">
+  <b>Koi Concept</b><br>
+  Fondo abstracto · WebGL
+</div>
 
-  <!-- Importmap: más estable para GitHub Pages -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
+<!-- Importmap (CLAVE para que no falle en GitHub Pages) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
   }
-  </script>
+}
+</script>
 
-  <script type="module" src="./estanquekoi.js"></script>
+<script type="module" src="estanquekoi.js"></script>
 </body>
 </html>
