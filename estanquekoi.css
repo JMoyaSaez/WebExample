@@ -1,25 +1,30 @@
-html, body { height: 100%; margin: 0; background:#05070a; overflow:hidden; }
-canvas { display:block; }
-
-#hud{
-  position:fixed; left:12px; top:12px; z-index:10;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:#cfe6ff; font-size:13px; line-height:1.25;
-  background:rgba(10,14,18,.55);
-  border:1px solid rgba(140,190,255,.12);
-  padding:10px 12px; border-radius:12px;
-  backdrop-filter: blur(8px);
-  user-select:none;
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #05070a;
+  height: 100%;
 }
-#hud b{ color:#fff; }
 
-#err{
-  position:fixed; left:12px; right:12px; bottom:12px; z-index:9999;
-  background:rgba(120,0,0,.35);
-  border:1px solid rgba(255,120,120,.45);
-  color:#ffecec;
-  padding:12px 14px;
-  border-radius:12px;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-  white-space:pre-wrap;
+canvas {
+  display: block;
+}
+
+#hud {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 10;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto;
+  font-size: 13px;
+  color: #d8ecff;
+  background: rgba(10, 14, 18, 0.55);
+  border: 1px solid rgba(140,190,255,0.15);
+  backdrop-filter: blur(8px);
+}
+
+#hud b {
+  color: #ffffff;
 }
