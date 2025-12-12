@@ -2,13 +2,46 @@
   const canvas = document.getElementById("fluid");
   const info = document.getElementById("info");
 
+  // --- UI (sliders) ---
+  const ui = {
+    core: document.getElementById("core"),
+    halo: document.getElementById("halo"),
+    coreVal: document.getElementById("coreVal"),
+    haloVal: document.getElementById("haloVal"),
+  };
+
+  const LOOK = {
+    core: ui.core ? Number(ui.core.value) : 650,
+    halo: ui.halo ? Number(ui.halo.value) : 55,
+    fade: 0.965, // longitud de la estela (por ahora fijo)
+  };
+
+  function syncUI() {
+    if (ui.core) LOOK.core = Number(ui.core.value);
+    if (ui.halo) LOOK.halo = Number(ui.halo.value);
+
+    if (ui.coreVal) ui.coreVal.textContent = String(LOOK.core);
+    if (ui.haloVal) ui.haloVal.textContent = String(LOOK.halo);
+  }
+
+  if (ui.core) ui.core.addEventListener("input", syncUI);
+  if (ui.halo) ui.halo.addEventListener("input", syncUI);
+  syncUI();
+
+  // --- WebGL2 ---
   const gl = canvas.getContext("webgl2", { alpha: false, antialias: true });
-  if (!gl) { if (info) info.textContent = "❌ WebGL2 no disponible."; return; }
+  if (!gl) {
+    if (info) info.textContent = "❌ WebGL2 no disponible.";
+    return;
+  }
 
   const ext = gl.getExtension("EXT_color_buffer_float");
-  if (!ext) { if (info) info.textContent = "❌ Falta EXT_color_buffer_float."; return; }
+  if (!ext) {
+    if (info) info.textContent = "❌ Falta EXT_color_buffer_float (driver/GPU).";
+    return;
+  }
 
-  if (info) info.textContent = "✅ Glow + Trail (ping-pong)";
+  if (info) info.textContent = "✅ Glow + Trail (sliders: Core/Halo)";
 
   function resize() {
     const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -18,9 +51,8 @@
     canvas.height = h;
     gl.viewport(0, 0, w, h);
   }
-  window.addEventListener("resize", () => { resize(); initBuffers(); });
-  resize();
 
+  // shader utils
   function compile(type, src) {
     const s = gl.createShader(type);
     gl.shaderSource(s, src);
@@ -31,6 +63,7 @@
     }
     return s;
   }
+
   function createProgram(vsSrc, fsSrc) {
     const p = gl.createProgram();
     gl.attachShader(p, compile(gl.VERTEX_SHADER, vsSrc));
@@ -42,6 +75,19 @@
     return p;
   }
 
+  // Fullscreen quad
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+
+  const vbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+    gl.STATIC_DRAW
+  );
+
+  // Shaders
   const VS = `#version 300 es
   in vec2 aPos;
   out vec2 vUv;
@@ -50,17 +96,19 @@
     gl_Position = vec4(aPos, 0.0, 1.0);
   }`;
 
-  // Paso A: escribe en un buffer (trail) = (trail anterior * fade) + glow(mouse)
+  // PASS 1: trail = prev * fade + glow(mouse)
   const FS_TRAIL = `#version 300 es
   precision highp float;
   in vec2 vUv;
   out vec4 o;
 
-  uniform sampler2D uPrev;   // trail anterior
-  uniform vec2 uMouse;       // 0..1
-  uniform vec2 uRes;         // pixels
-  uniform float uTime;       // sec
-  uniform float uFade;       // 0.0..1.0 (más alto = estela más larga)
+  uniform sampler2D uPrev;
+  uniform vec2 uMouse;     // 0..1
+  uniform vec2 uRes;       // pixels
+  uniform float uTime;     // sec
+  uniform float uFade;     // 0..1
+  uniform float uCore;     // core sharpness
+  uniform float uHalo;     // halo sharpness
 
   vec3 hsv2rgb(vec3 c){
     vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
@@ -76,14 +124,6 @@
 
     float d = distance(p, m);
 
-//-------------------------------------------------------------------------
-//-------------------------------------------------------------------------
-    float uCore = 500.0;   // 600..2000 aprox
-    float uHalo = 40.0;   // 40..300 aprox
-
-//-------------------------------------------------------------------------
-//-------------------------------------------------------------------------
-
     float core = exp(-d*d * uCore);
     float halo = exp(-d*d * uHalo);
 
@@ -92,21 +132,15 @@
 
     vec3 glow = col * (core * 1.2 + halo * 0.35);
 
-    vec3 prev = texture(uPrev, vUv).rgb;
+    vec3 prev = texture(uPrev, vUv).rgb * uFade;
 
-    // Dissipation (estela se desvanece)
-    prev *= uFade;
-
-    // Suma (estela + glow actual)
     vec3 outc = prev + glow;
-
-    // Pequeño clamp para evitar quemar blancos
-    outc = min(outc, vec3(6.0));
+    outc = min(outc, vec3(6.0)); // evita quemar
 
     o = vec4(outc, 1.0);
   }`;
 
-  // Paso B: display del buffer con curva de brillo tipo neón
+  // PASS 2: display
   const FS_DISPLAY = `#version 300 es
   precision highp float;
   in vec2 vUv;
@@ -119,41 +153,34 @@
   }`;
 
   const progTrail = createProgram(VS, FS_TRAIL);
-  const progDisp  = createProgram(VS, FS_DISPLAY);
+  const progDisp = createProgram(VS, FS_DISPLAY);
 
-  // Fullscreen quad
-  const vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-  const vbo = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1,-1,  1,-1,  -1,1,  1,1
-  ]), gl.STATIC_DRAW);
-
-  function bindAttrib(prog){
-    const locPos = gl.getAttribLocation(prog, "aPos");
-    gl.enableVertexAttribArray(locPos);
-    gl.vertexAttribPointer(locPos, 2, gl.FLOAT, false, 0, 0);
+  // bind attribute once (same VAO works)
+  function bindAttrib(prog) {
+    const loc = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   }
-  bindAttrib(progTrail); // mismo VAO sirve para ambos
+  bindAttrib(progTrail);
+
   gl.bindVertexArray(null);
 
-  // Mouse (UV) desde rect CSS (robusto)
+  // Mouse in UV via CSS rect (robust)
   const mouse = { u: 0.5, v: 0.5 };
-  function setMouse(e){
+  function setMouse(e) {
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
     mouse.u = x;
     mouse.v = 1.0 - y;
   }
-  window.addEventListener("pointermove", setMouse, { passive:true });
-  window.addEventListener("pointerdown", setMouse, { passive:true });
+  window.addEventListener("pointermove", setMouse, { passive: true });
+  window.addEventListener("pointerdown", setMouse, { passive: true });
 
   // Ping-pong buffers
   let texA, texB, fboA, fboB;
 
-  function makeTex(w,h){
+  function makeTex(w, h) {
     const t = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, t);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -164,58 +191,69 @@
     gl.bindTexture(gl.TEXTURE_2D, null);
     return t;
   }
-  function makeFbo(t){
+
+  function makeFbo(t) {
     const fb = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
-    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE)
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
       throw new Error("FBO incomplete");
+    }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return fb;
   }
 
-  function initBuffers(){
+  function initBuffers() {
     const w = canvas.width;
     const h = canvas.height;
 
-    texA = makeTex(w,h);
-    texB = makeTex(w,h);
+    texA = makeTex(w, h);
+    texB = makeTex(w, h);
     fboA = makeFbo(texA);
     fboB = makeFbo(texB);
 
-    // clear both
-    gl.clearColor(0,0,0,1);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fboA); gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fboB); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clearColor(0, 0, 0, 1);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fboA);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fboB);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
-  initBuffers();
 
-  // uniforms locs
+  // Uniform locations
   const uPrevTrail = gl.getUniformLocation(progTrail, "uPrev");
-  const uMouseTrail= gl.getUniformLocation(progTrail, "uMouse");
-  const uResTrail  = gl.getUniformLocation(progTrail, "uRes");
+  const uMouseTrail = gl.getUniformLocation(progTrail, "uMouse");
+  const uResTrail = gl.getUniformLocation(progTrail, "uRes");
   const uTimeTrail = gl.getUniformLocation(progTrail, "uTime");
   const uFadeTrail = gl.getUniformLocation(progTrail, "uFade");
+  const uCoreTrail = gl.getUniformLocation(progTrail, "uCore");
+  const uHaloTrail = gl.getUniformLocation(progTrail, "uHalo");
 
-  const uTexDisp   = gl.getUniformLocation(progDisp, "uTex");
+  const uTexDisp = gl.getUniformLocation(progDisp, "uTex");
 
-  function drawFullscreen(targetFbo, prog){
-    gl.useProgram(prog);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, targetFbo);
+  function drawQuad() {
     gl.bindVertexArray(vao);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.bindVertexArray(null);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
   let ping = true;
   let t0 = performance.now();
 
-  function frame(now){
+  // init once
+  resize();
+  initBuffers();
+
+  // handle resize
+  window.addEventListener("resize", () => {
+    resize();
+    initBuffers();
+  });
+
+  function frame(now) {
     const time = (now - t0) / 1000;
 
-    // auto-resize si cambia layout
+    // auto-resize if layout changes (GitHub Pages sometimes)
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const w = Math.floor(innerWidth * dpr);
     const h = Math.floor(innerHeight * dpr);
@@ -228,9 +266,9 @@
     const nextFbo = ping ? fboB : fboA;
     const nextTex = ping ? texB : texA;
 
-    // PASS 1: trail update into nextFbo
+    // PASS 1: update trail into nextFbo
     gl.useProgram(progTrail);
-    gl.bindVertexArray(vao);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, nextFbo);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, prevTex);
@@ -239,28 +277,23 @@
     gl.uniform2f(uMouseTrail, mouse.u, mouse.v);
     gl.uniform2f(uResTrail, canvas.width, canvas.height);
     gl.uniform1f(uTimeTrail, time);
+    gl.uniform1f(uFadeTrail, LOOK.fade);
 
-    // estela: prueba 0.965 (larga) o 0.94 (corta)
-    gl.uniform1f(uFadeTrail, 0.965);
+    // sliders:
+    gl.uniform1f(uCoreTrail, LOOK.core);
+    gl.uniform1f(uHaloTrail, LOOK.halo);
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, nextFbo);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    drawQuad();
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    gl.bindVertexArray(null);
-
-    // PASS 2: display nextTex to screen
+    // PASS 2: display nextTex
     gl.useProgram(progDisp);
-    gl.bindVertexArray(vao);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, nextTex);
     gl.uniform1i(uTexDisp, 0);
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-    gl.bindVertexArray(null);
+    drawQuad();
 
     ping = !ping;
     requestAnimationFrame(frame);
