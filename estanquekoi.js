@@ -176,7 +176,8 @@ function swimPose(t){
 
 function animate(){
   requestAnimationFrame(animate);
-  const t = clock.elapsedTime;
+
+  const t = clock.getElapsedTime(); // ✅ ESTA es la clave
   bgMat.uniforms.uTime.value = t;
 
   const p = swimPose(t);
@@ -188,22 +189,22 @@ function animate(){
   const ang = Math.atan2(dir.y, dir.x);
   koi.rotation.z = ang;
 
-  // ondulación (cola + cuerpo) -> deformación simple con escala/rotación de grupo
-  const wiggle = Math.sin(t*6.0) * 0.12;
+  // ondulación (da vida)
+  const wiggle = Math.sin(t * 6.0) * 0.12;
   koiBody.rotation.z = wiggle * 0.35;
   spots.rotation.z = wiggle * 0.45;
 
-  // aletas
   finL.rotation.z = 0.25 + Math.sin(t*10.0) * 0.25;
   finR.rotation.z = -0.25 - Math.sin(t*10.0) * 0.25;
 
-  // “respira” un pelín (da vida)
+  // “respira” un pelín
   const breathe = 1.0 + Math.sin(t*1.7)*0.01;
   koi.scale.set(breathe, breathe, 1);
 
   renderer.render(scene, camera);
 }
 animate();
+
 
 // ---------- Resize ----------
 window.addEventListener("resize", () => {
