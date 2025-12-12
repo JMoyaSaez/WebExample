@@ -23,3 +23,23 @@ canvas {
   max-width: 360px;
 }
 .hud b { color:#fff; }
+
+.controls{
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+.controls label{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.controls input[type="range"]{
+  grid-column: 1 / -1;
+  width: 100%;
+}
+.controls span{
+  color:#fff;
+  font-variant-numeric: tabular-nums;
+}
