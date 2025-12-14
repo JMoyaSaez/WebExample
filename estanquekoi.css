@@ -1,30 +1,15 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #05070a;
-  height: 100%;
-}
+html, body { margin:0; height:100%; overflow:hidden; background:#071018; }
+canvas { display:block; }
 
-canvas {
-  display: block;
-}
-
-#hud {
-  position: fixed;
-  top: 14px;
-  left: 14px;
-  z-index: 10;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto;
-  font-size: 13px;
-  color: #d8ecff;
-  background: rgba(10, 14, 18, 0.55);
-  border: 1px solid rgba(140,190,255,0.15);
+#hud{
+  position:fixed; left:12px; top:12px; z-index:10;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  font-size:13px; line-height:1.25;
+  color:#d8f0ff;
+  background:rgba(8,16,24,.55);
+  border:1px solid rgba(130,200,255,.14);
+  padding:10px 12px; border-radius:12px;
   backdrop-filter: blur(8px);
+  user-select:none;
 }
-
-#hud b {
-  color: #ffffff;
-}
+#hud b{ color:#fff; }
