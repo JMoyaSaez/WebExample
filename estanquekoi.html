@@ -1,22 +1,33 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Estanque Koi · Zenital</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="estanquekoi.css">
-</head>
-<body>
-  <div id="hud"><b>Estanque Koi</b><br/>Vista cenital · movimiento natural</div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Estanque Koi · WebGL</title>
+    <link rel="stylesheet" href="estanquekoi.css" />
 
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-    }
-  }
-  </script>
+    <!-- Importmap: evita el error de "three/addons/..." -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
 
-  <script type="module" src="estanquekoi.js"></script>
-</body>
+  <body>
+    <div id="hud">
+      <div class="title">Koi Pond</div>
+      <div class="hint">
+        Mueve el ratón para generar ondas · Click: “comida” (los atrae) · Space: pausa
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+
+    <canvas id="c"></canvas>
+
+    <script type="module" src="estanquekoi.js"></script>
+  </body>
 </html>
