@@ -2,26 +2,21 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Estanque Koi · WebGL</title>
+  <title>Estanque Koi · Zenital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="estanquekoi.css">
 </head>
 <body>
+  <div id="hud"><b>Estanque Koi</b><br/>Vista cenital · movimiento natural</div>
 
-<div id="hud">
-  <b>Koi Concept</b><br>
-  Fondo abstracto · WebGL
-</div>
-
-<!-- Importmap (CLAVE para que no falle en GitHub Pages) -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
   }
-}
-</script>
+  </script>
 
-<script type="module" src="estanquekoi.js"></script>
+  <script type="module" src="estanquekoi.js"></script>
 </body>
 </html>
