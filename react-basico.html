@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mi primer React (sin instalar nada)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- React y ReactDOM desde CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+  <!-- Babel para poder usar JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    .card {
+      width: min(420px, 100%);
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.4);
+      text-align: center;
+    }
+
+    button {
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .plus {
+      background: #2563eb;
+      color: white;
+    }
+
+    .minus {
+      background: #0b1220;
+      color: #e5e7eb;
+      border: 1px solid #475569;
+    }
+
+    .reset {
+      background: #7c2d12;
+      color: white;
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Aquí React pinta la app -->
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      const [count, setCount] = React.useState(0);
+
+      let message = "¡Vamos!";
+      if (count >= 5) message = "¡Bien!";
+      if (count >= 10) message = "🔥 Nivel PRO";
+
+      return (
+        <div className="card">
+          <h1>Mi primer React</h1>
+
+          <p>Contador: <strong>{count}</strong></p>
+          <p>{message}</p>
+
+          <div>
+            <button className="plus" onClick={() => setCount(count + 1)}>+1</button>
+            <button className="minus" onClick={() => setCount(Math.max(0, count - 1))}>-1</button>
+            <button className="reset" onClick={() => setCount(0)}>Reset</button>
+          </div>
+
+          <p className="hint">
+            Esto es React usando estado (<code>useState</code>) sin instalar nada.
+          </p>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+
+</body>
+</html>
