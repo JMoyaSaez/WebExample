@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mi primer Vue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Vue 3 desde CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    .card {
+      width: min(420px, 100%);
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.4);
+      text-align: center;
+    }
+
+    button {
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .plus {
+      background: #22c55e;
+      color: #022c22;
+    }
+
+    .minus {
+      background: #0b1220;
+      color: #e5e7eb;
+      border: 1px solid #475569;
+    }
+
+    .reset {
+      background: #7c2d12;
+      color: white;
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #86efac;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Vue controla SOLO este div -->
+  <div id="app" class="card">
+    <h1>Mi primer Vue</h1>
+
+    <p>Contador: <strong>{{ count }}</strong></p>
+    <p>{{ message }}</p>
+
+    <div>
+      <button class="plus" @click="count++">+1</button>
+      <button class="minus" @click="count = Math.max(0, count - 1)">-1</button>
+      <button class="reset" @click="count = 0">Reset</button>
+    </div>
+
+    <p class="hint">
+      Vue reacciona automáticamente a los cambios del estado.
+    </p>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          count: 0
+        };
+      },
+      computed: {
+        message() {
+          if (this.count >= 10) return "🔥 Nivel PRO";
+          if (this.count >= 5) return "¡Bien!";
+          return "¡Vamos!";
+        }
+      }
+    }).mount("#app");
+  </script>
+
+</body>
+</html>
