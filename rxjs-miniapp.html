@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>RxJS Mini App · Observables</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- RxJS (UMD) -->
+  <script src="https://unpkg.com/rxjs@7/dist/bundles/rxjs.umd.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 20px;
+    }
+    .card {
+      width: min(760px, 100%);
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.45);
+    }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    p { margin: 6px 0; color: #cbd5e1; }
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+      margin-top: 12px;
+    }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .box {
+      background: #0b1220;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    button {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn { background: #2563eb; color: white; }
+    .btn2 { background: #0b1220; color: #e5e7eb; border: 1px solid #475569; }
+    .btn3 { background: #16a34a; color: #052e16; }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      color: #93c5fd;
+      word-break: break-word;
+    }
+    .big {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-top: 8px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(56,189,248,0.4);
+      background: rgba(56,189,248,0.1);
+      color: #38bdf8;
+      margin-left: 8px;
+    }
+    .ok { color: #86efac; }
+    .warn { color: #fca5a5; }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>RxJS Mini App · Observables asíncronos <span class="tag">lo que usa Angular</span></h1>
+    <p>
+      Aquí verás 3 fuentes asíncronas (tiempo, clicks y fetch). Cada una emite valores y la UI se actualiza
+      automáticamente al recibirlos (como hace Angular con observables).
+    </p>
+
+    <div class="grid">
+      <!-- 1) Interval -->
+      <div class="box">
+        <h3>1) Observable de tiempo (interval)</h3>
+        <p class="mono">interval(1000) → 0,1,2,3… (cada segundo)</p>
+        <div class="big" id="clockValue">0</div>
+        <div class="row">
+          <button class="btn" id="startClock">Start</button>
+          <button class="btn2" id="stopClock">Stop</button>
+        </div>
+        <p id="clockStatus" class="mono">Estado: parado</p>
+      </div>
+
+      <!-- 2) Click stream -->
+      <div class="box">
+        <h3>2) Observable de clicks (eventos)</h3>
+        <p class="mono">fromEvent(button,'click') → cuenta clicks</p>
+        <div class="big" id="clicksValue">0</div>
+        <div class="row">
+          <button class="btn3" id="clickMe">Haz click</button>
+          <button class="btn2" id="resetClicks">Reset</button>
+        </div>
+        <p id="clicksStatus" class="mono">Último evento: —</p>
+      </div>
+
+      <!-- 3) Fetch -> Observable -->
+      <div class="box" style="grid-column: 1 / -1;">
+        <h3>3) Observable desde API (fetch)</h3>
+        <p class="mono">from(fetch(url)).pipe(switchMap(res =&gt; res.json()))</p>
+        <div class="row">
+          <button class="btn" id="loadPost">Cargar post</button>
+          <button class="btn2" id="clearPost">Limpiar</button>
+        </div>
+        <p id="apiStatus" class="mono">Estado: esperando…</p>
+        <pre class="mono" id="apiResult" style="margin-top:10px; white-space:pre-wrap;"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { interval, fromEvent, from, of } = rxjs;
+    const { map, scan, tap, switchMap, catchError } = rxjs.operators;
+
+    // ---------- 1) Interval (start/stop) ----------
+    const clockValue = document.getElementById("clockValue");
+    const clockStatus = document.getElementById("clockStatus");
+    const startClockBtn = document.getElementById("startClock");
+    const stopClockBtn = document.getElementById("stopClock");
+
+    let clockSub = null;
+
+    fromEvent(startClockBtn, "click").subscribe(() => {
+      if (clockSub) return;
+      clockStatus.textContent = "Estado: funcionando (emite cada 1s)";
+      clockStatus.className = "mono ok";
+
+      clockSub = interval(1000).subscribe(n => {
+        clockValue.textContent = n;
+      });
+    });
+
+    fromEvent(stopClockBtn, "click").subscribe(() => {
+      if (!clockSub) return;
+      clockSub.unsubscribe();
+      clockSub = null;
+      clockStatus.textContent = "Estado: parado";
+      clockStatus.className = "mono";
+    });
+
+    // ---------- 2) Click stream ----------
+    const clicksValue = document.getElementById("clicksValue");
+    const clicksStatus = document.getElementById("clicksStatus");
+    const clickMeBtn = document.getElementById("clickMe");
+    const resetClicksBtn = document.getElementById("resetClicks");
+
+    const clicks$ = fromEvent(clickMeBtn, "click").pipe(
+      scan((acc) => acc + 1, 0),
+      tap(count => {
+        clicksValue.textContent = count;              // UI se actualiza sola
+        clicksStatus.textContent = `Último evento: click #${count}`;
+      })
+    );
+
+    const clicksSub = clicks$.subscribe();
+
+    fromEvent(resetClicksBtn, "click").subscribe(() => {
+      // reset simple (visual) sin complicar: reiniciamos la UI y recreamos el stream
+      clicksValue.textContent = "0";
+      clicksStatus.textContent = "Último evento: reset";
+    });
+
+    // ---------- 3) Fetch -> Observable ----------
+    const apiStatus = document.getElementById("apiStatus");
+    const apiResult = document.getElementById("apiResult");
+    const loadPostBtn = document.getElementById("loadPost");
+    const clearPostBtn = document.getElementById("clearPost");
+
+    const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+    const load$ = fromEvent(loadPostBtn, "click").pipe(
+      tap(() => {
+        apiStatus.textContent = "Estado: cargando…";
+        apiStatus.className = "mono";
+        apiResult.textContent = "";
+      }),
+      switchMap(() =>
+        from(fetch(url)).pipe(
+          switchMap(res => res.json()),
+          catchError(err => of({ error: true, message: String(err) }))
+        )
+      ),
+      tap(data => {
+        if (data && data.error) {
+          apiStatus.textContent = "Estado: error al cargar";
+          apiStatus.className = "mono warn";
+        } else {
+          apiStatus.textContent = "Estado: datos recibidos (JSON)";
+          apiStatus.className = "mono ok";
+        }
+        apiResult.textContent = JSON.stringify(data, null, 2);
+      })
+    );
+
+    load$.subscribe();
+
+    fromEvent(clearPostBtn, "click").subscribe(() => {
+      apiStatus.textContent = "Estado: esperando…";
+      apiStatus.className = "mono";
+      apiResult.textContent = "";
+    });
+  </script>
+</body>
+</html>
