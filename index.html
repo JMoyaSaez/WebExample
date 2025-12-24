@@ -340,6 +340,39 @@
   gap: 1.5rem;
 }
 
+    /* === OVERRIDE FINAL: cards debajo y ocupando ancho === */
+main.layout{
+  width: 100% !important;
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+  padding: 2rem !important;
+  display: block !important; /* por si tenías grid/columnas antes */
+}
+
+main.layout > section.intro{
+  width: 100% !important;
+  max-width: none !important;
+}
+
+main.layout > section.cards{
+  width: 100% !important;
+  max-width: none !important;
+  margin-top: 1.5rem !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+  gap: 1.5rem !important;
+  align-items: stretch !important;
+}
+
+/* por si alguna card tenía width fijo */
+main.layout > section.cards .card,
+main.layout > section.cards .demo-card,
+main.layout > section.cards article{
+  width: auto !important;
+  max-width: none !important;
+}
+
     footer {
       margin-top: 14px;
       font-size: 0.72rem;
