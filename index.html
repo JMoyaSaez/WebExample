@@ -325,40 +325,21 @@
 
 
     /* ===== Layout principal ===== */
+
 .layout {
-  display: grid;
-  grid-template-columns: minmax(420px, 1fr) 420px;
-  gap: 2rem;
   max-width: 1600px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-/* ===== Columna cards ===== */
+/* Cards en grid ancho */
 .cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
 }
 
-/* ===== Sticky opcional (RECOMENDADO) ===== */
-.cards {
-  position: sticky;
-  top: 2rem;
-  align-self: start;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .cards {
-    position: static;
-  }
-}
-/* ===== Columna cards ===== */
     footer {
       margin-top: 14px;
       font-size: 0.72rem;
@@ -425,8 +406,7 @@
         </div>
       </section>
 
-     <!--<section class="grid">-->
-      <aside class="cards"> 
+     <<section class="grid">
         <!-- TV HTML5 + YouTube -->
         <a class="card" href="TV.html">
           <div class="card-topline">
@@ -586,8 +566,7 @@
             <span>Explora y amplía</span>
           </div>
         </a>
-      </aside>
-      <!--</section>-->
+      </section>
     </main>
 
     <footer>
