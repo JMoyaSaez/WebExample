@@ -323,6 +323,42 @@
       box-shadow: 0 0 0 4px rgba(34,197,94,0.16);
     }
 
+
+    /* ===== Layout principal ===== */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) 420px;
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ===== Columna cards ===== */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ===== Sticky opcional (RECOMENDADO) ===== */
+.cards {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cards {
+    position: static;
+  }
+}
+/* ===== Columna cards ===== */
     footer {
       margin-top: 14px;
       font-size: 0.72rem;
@@ -389,7 +425,8 @@
         </div>
       </section>
 
-      <section class="grid">
+     <!--<section class="grid">-->
+      <aside class="cards"> 
         <!-- TV HTML5 + YouTube -->
         <a class="card" href="TV.html">
           <div class="card-topline">
@@ -549,7 +586,8 @@
             <span>Explora y amplía</span>
           </div>
         </a>
-      </section>
+      </aside>
+      <!--</section>-->
     </main>
 
     <footer>
