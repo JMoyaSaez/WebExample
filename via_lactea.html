@@ -23,7 +23,7 @@
       position: fixed;
       top: 14px;
       right: 14px;
-      width: 290px;
+      width: 300px;
       border-radius: 16px;
       background: rgba(8, 10, 20, 0.58);
       color: #eef1ff;
@@ -129,24 +129,32 @@
 
   <div id="panel">
     <div id="panelHeader">
-      <div id="panelTitle">Vía Láctea</div>
+      <div id="panelTitle">Galaxia espiral</div>
       <div id="panelToggle">–</div>
     </div>
     <div id="panelBody">
       <div class="row">
         <div class="rowHeader">
           <span>Intensidad nebulosa</span>
-          <span id="nebulaValue" class="value">0.55</span>
+          <span id="nebulaValue" class="value">0.90</span>
         </div>
-        <input id="nebulaSlider" type="range" min="0" max="1.5" step="0.01" value="0.55" />
+        <input id="nebulaSlider" type="range" min="0.20" max="1.80" step="0.01" value="0.90" />
       </div>
 
       <div class="row">
         <div class="rowHeader">
           <span>Densidad estrellas</span>
-          <span id="starsValue" class="value">1.75</span>
+          <span id="starsValue" class="value">4.80</span>
         </div>
-        <input id="starsSlider" type="range" min="0.5" max="3.0" step="0.01" value="1.75" />
+        <input id="starsSlider" type="range" min="1.00" max="8.00" step="0.01" value="4.80" />
+      </div>
+
+      <div class="row">
+        <div class="rowHeader">
+          <span>Zoom</span>
+          <span id="zoomValue" class="value">1.35</span>
+        </div>
+        <input id="zoomSlider" type="range" min="0.70" max="2.60" step="0.01" value="1.35" />
       </div>
 
       <div class="checkRow">
@@ -155,7 +163,7 @@
       </div>
 
       <div class="hint">
-        Esta versión parte de una base más estable: menos nebulosa, más estrellas, panel plegable y shader corregido.
+        Ahora hay muchísimo más campo estelar y control de zoom. Para un look más cargado, prueba estrellas entre 5.50 y 7.00.
       </div>
     </div>
   </div>
@@ -174,21 +182,26 @@
       const panelToggle = document.getElementById('panelToggle');
       const nebulaSlider = document.getElementById('nebulaSlider');
       const starsSlider = document.getElementById('starsSlider');
+      const zoomSlider = document.getElementById('zoomSlider');
       const fxToggle = document.getElementById('fxToggle');
       const nebulaValue = document.getElementById('nebulaValue');
       const starsValue = document.getElementById('starsValue');
+      const zoomValue = document.getElementById('zoomValue');
 
       const settings = {
-        nebula: 0.55,
-        stars: 1.75,
+        nebula: 0.90,
+        stars: 4.80,
+        zoom: 1.35,
         fx: 1.0
       };
 
       function syncUI() {
         nebulaValue.textContent = settings.nebula.toFixed(2);
         starsValue.textContent = settings.stars.toFixed(2);
+        zoomValue.textContent = settings.zoom.toFixed(2);
         nebulaSlider.value = settings.nebula;
         starsSlider.value = settings.stars;
+        zoomSlider.value = settings.zoom;
         fxToggle.checked = settings.fx > 0.5;
       }
 
@@ -204,6 +217,11 @@
 
       starsSlider.addEventListener('input', () => {
         settings.stars = parseFloat(starsSlider.value);
+        syncUI();
+      });
+
+      zoomSlider.addEventListener('input', () => {
+        settings.zoom = parseFloat(zoomSlider.value);
         syncUI();
       });
 
@@ -245,20 +263,6 @@
         return p;
       }
 
-      function runSelfChecks(shaderSource) {
-        const reservedWords = ['active'];
-        const problems = [];
-        for (const word of reservedWords) {
-          const re = new RegExp('\\b' + word + '\\b');
-          if (re.test(shaderSource)) {
-            problems.push(word);
-          }
-        }
-        if (problems.length) {
-          console.warn('Posibles nombres conflictivos en shader:', problems.join(', '));
-        }
-      }
-
       const VS = `#version 300 es
       in vec2 aPos;
       out vec2 vUv;
@@ -277,7 +281,10 @@
       uniform float uTime;
       uniform float uNebula;
       uniform float uStars;
+      uniform float uZoom;
       uniform float uFx;
+
+      #define PI 3.14159265359
 
       float hash21(vec2 p) {
         p = fract(p * vec2(123.34, 456.21));
@@ -294,12 +301,10 @@
       float noise(vec2 p) {
         vec2 i = floor(p);
         vec2 f = fract(p);
-
         float a = hash21(i);
         float b = hash21(i + vec2(1.0, 0.0));
         float c = hash21(i + vec2(0.0, 1.0));
         float d = hash21(i + vec2(1.0, 1.0));
-
         vec2 u = f * f * (3.0 - 2.0 * f);
         return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
       }
@@ -308,7 +313,7 @@
         float v = 0.0;
         float a = 0.5;
         mat2 m = mat2(1.6, -1.2, 1.2, 1.6);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
           v += a * noise(p);
           p = m * p;
           a *= 0.5;
@@ -321,42 +326,37 @@
         return mat2(c, -s, s, c);
       }
 
-      vec3 palette(float t) {
-        vec3 a = vec3(0.02, 0.03, 0.07);
-        vec3 b = vec3(0.07, 0.10, 0.22);
-        vec3 c = vec3(0.26, 0.22, 0.46);
-        vec3 d = vec3(0.95, 0.82, 0.58);
-        return mix(mix(a, b, smoothstep(0.0, 0.55, t)), mix(c, d, smoothstep(0.6, 1.0, t)), t);
+      vec3 starTint(float h) {
+        vec3 warm = vec3(1.0, 0.89, 0.72);
+        vec3 neutral = vec3(1.0, 0.97, 0.93);
+        vec3 cold = vec3(0.75, 0.86, 1.0);
+        return mix(mix(warm, neutral, 0.55), cold, smoothstep(0.30, 0.85, h));
       }
 
       vec3 starField(vec2 uv, float scale, float threshold, float sizeMul, float seed) {
         vec2 p = uv * scale;
         vec2 id = floor(p);
         vec2 gv = fract(p) - 0.5;
-
         float h = hash21(id + seed);
         if (h < threshold) return vec3(0.0);
 
-        vec2 off = (hash22(id + seed * 3.7) - 0.5) * 0.7;
+        vec2 off = (hash22(id + seed * 3.7) - 0.5) * 0.72;
         vec2 d = gv - off;
         float dist = length(d);
 
         float bright = hash21(id + seed * 7.1);
-        float tw = 0.75 + 0.25 * sin(uTime * (1.2 + bright * 2.6) + bright * 20.0);
+        float tw = 0.78 + 0.22 * sin(uTime * (1.1 + bright * 2.8) + bright * 20.0);
+        float radius = mix(0.010, 0.030, bright) * sizeMul;
+        float core = exp(-pow(dist / radius, 2.0) * 3.2);
+        float halo = exp(-pow(dist / (radius * 4.5), 2.0) * 1.2) * 0.38;
 
-        float radius = mix(0.012, 0.030, bright) * sizeMul;
-        float core = exp(-pow(dist / radius, 2.0) * 3.0);
-        float halo = exp(-pow(dist / (radius * 4.2), 2.0) * 1.0) * 0.35;
-
-        vec3 tint = mix(vec3(1.0, 0.94, 0.86), vec3(0.80, 0.88, 1.0), hash21(id + seed * 11.0));
-        return tint * (core + halo) * tw;
+        return starTint(hash21(id + seed * 11.0)) * (core + halo) * tw;
       }
 
       vec3 brightStar(vec2 uv, float scale, float threshold, float seed) {
         vec2 p = uv * scale;
         vec2 id = floor(p);
         vec2 gv = fract(p) - 0.5;
-
         float h = hash21(id + seed);
         if (h < threshold) return vec3(0.0);
 
@@ -365,56 +365,101 @@
         float dist = length(d);
         float ang = atan(d.y, d.x);
         float rnd = hash21(id + seed * 8.7);
+        float radius = mix(0.02, 0.055, rnd);
+        float core = exp(-pow(dist / radius, 2.0) * 3.3);
+        float halo = exp(-pow(dist / (radius * 5.8), 2.0) * 1.15) * 0.58;
+        float spikes = pow(max(0.0, cos(ang * 4.0)), 18.0) * exp(-dist / (radius * 7.5)) * 0.36;
+        float tw = 0.82 + 0.18 * sin(uTime * (1.0 + rnd * 1.7) + rnd * 28.0);
+        return starTint(rnd) * (core * 1.85 + halo + spikes) * tw;
+      }
 
-        float radius = mix(0.02, 0.05, rnd);
-        float core = exp(-pow(dist / radius, 2.0) * 3.2);
-        float halo = exp(-pow(dist / (radius * 5.0), 2.0) * 1.2) * 0.5;
-        float spikes = pow(max(0.0, cos(ang * 4.0)), 18.0) * exp(-dist / (radius * 7.0)) * 0.32;
-        float tw = 0.82 + 0.18 * sin(uTime * (1.0 + rnd * 1.8) + rnd * 28.0);
-
-        vec3 tint = mix(vec3(1.0, 0.95, 0.88), vec3(0.84, 0.91, 1.0), rnd);
-        return tint * (core * 1.8 + halo + spikes) * tw;
+      float spiralMask(vec2 p, float arms, float twist, float width, float offset) {
+        float r = length(p) + 0.0001;
+        float a = atan(p.y, p.x);
+        float spiral = cos(a * arms - log(r + 1.0) * twist + offset);
+        return smoothstep(width, 1.0, spiral);
       }
 
       vec3 shootingStar(vec2 uv, float aspect) {
-        float period = 12.0;
+        float period = 10.5;
+        float idx = floor(uTime / period);
         float local = mod(uTime, period);
-        float isActive = smoothstep(1.0, 1.25, local) * (1.0 - smoothstep(2.0, 2.6, local));
+        float isActive = smoothstep(0.8, 1.05, local) * (1.0 - smoothstep(2.0, 2.9, local));
         if (isActive <= 0.0) return vec3(0.0);
 
-        vec2 start = vec2(aspect * 1.1, 0.65);
-        vec2 dir = normalize(vec2(-1.0, -0.28));
-        float prog = clamp((local - 1.0) / 1.2, 0.0, 1.0);
-        vec2 head = start + dir * prog * (aspect * 1.8);
+        vec2 rndA = hash22(vec2(idx + 17.3, idx * 0.73 + 3.1));
+        vec2 rndB = hash22(vec2(idx + 71.9, idx * 1.13 + 8.4));
+        float edgeSel = hash21(vec2(idx + 91.0, 4.7));
+
+        vec2 start;
+        if (edgeSel < 0.25) {
+          start = vec2(-aspect * 1.18, mix(-1.0, 1.0, rndA.y));
+        } else if (edgeSel < 0.50) {
+          start = vec2(aspect * 1.18, mix(-1.0, 1.0, rndA.y));
+        } else if (edgeSel < 0.75) {
+          start = vec2(mix(-aspect, aspect, rndA.x), 1.18);
+        } else {
+          start = vec2(mix(-aspect, aspect, rndA.x), -1.18);
+        }
+
+        vec2 target = vec2(
+          mix(-aspect * 0.45, aspect * 0.45, rndB.x),
+          mix(-0.38, 0.38, rndB.y)
+        );
+
+        vec2 dir = normalize(target - start);
+        float travel = length(target - start) + 1.8;
+        float prog = clamp((local - 0.8) / 1.45, 0.0, 1.0);
+        vec2 head = start + dir * prog * travel;
 
         vec2 rel = uv - head;
         float along = dot(rel, -dir);
-        vec2 closest = (-dir) * clamp(along, 0.0, 0.55);
+        vec2 closest = (-dir) * clamp(along, 0.0, 0.82);
         float perp = length(rel - closest);
 
-        float trail = exp(-perp * 150.0) * exp(-along * 5.5) * step(0.0, along) * (1.0 - step(0.55, along));
-        float headGlow = exp(-length(uv - head) * 95.0) * 2.0;
-        return vec3(1.15, 1.05, 0.95) * (trail + headGlow) * isActive;
+        float trail = exp(-perp * 155.0) * exp(-along * 4.8) * step(0.0, along) * (1.0 - step(0.82, along));
+        float glow = exp(-length(uv - head) * 88.0) * 2.2;
+        vec3 tint = mix(vec3(1.25, 1.12, 0.96), vec3(0.82, 0.90, 1.15), rndB.x * 0.55);
+        return tint * (trail + glow) * isActive;
       }
 
       vec3 supernova(vec2 uv, float aspect) {
-        float period = 26.0;
-        float local = mod(uTime + 7.0, period);
-        float isActive = smoothstep(4.0, 5.0, local) * (1.0 - smoothstep(8.0, 11.5, local));
+        float period = 24.0;
+        float idx = floor((uTime + 6.0) / period);
+        float local = mod(uTime + 6.0, period);
+        float isActive = smoothstep(4.0, 4.8, local) * (1.0 - smoothstep(8.5, 12.0, local));
         if (isActive <= 0.0) return vec3(0.0);
 
-        vec2 pos = vec2(-aspect * 0.30, 0.18);
+        vec2 rnd = hash22(vec2(idx + 41.7, idx * 0.61 + 2.9));
+        vec2 rnd2 = hash22(vec2(idx + 97.1, idx * 1.07 + 5.3));
+
+        vec2 pos = vec2(
+          mix(-aspect * 0.70, aspect * 0.70, rnd.x),
+          mix(-0.42, 0.42, rnd.y)
+        );
+
         vec2 dvec = uv - pos;
         float d = length(dvec);
         float ang = atan(dvec.y, dvec.x);
         float burst = clamp((local - 4.0) / 3.0, 0.0, 1.0);
 
-        float core = exp(-pow(d / 0.035, 2.0) * 3.0) * (0.95 + 0.05 * sin(uTime * 16.0));
-        float ringR = mix(0.02, 0.18, burst);
-        float ring = exp(-pow((d - ringR) / 0.018, 2.0) * 8.0) * burst;
-        float rays = pow(max(0.0, cos(ang * 6.0)), 14.0) * exp(-d / (0.12 + burst * 0.18)) * 0.5;
+        float core = exp(-pow(d / 0.035, 2.0) * 3.0) * (0.92 + 0.08 * sin(uTime * (12.0 + rnd2.x * 8.0)));
+        float ringR = mix(0.02, 0.20 + rnd2.x * 0.05, burst);
+        float ring = exp(-pow((d - ringR) / (0.016 + rnd2.y * 0.010), 2.0) * 8.0) * burst;
+        float rays = pow(max(0.0, cos(ang * (5.0 + floor(rnd2.x * 3.0)))), 14.0) * exp(-d / (0.12 + burst * 0.18)) * 0.55;
 
-        return (vec3(1.45, 1.10, 0.80) * core * 1.6 + vec3(1.10, 0.78, 1.40) * ring + vec3(1.0) * rays * 0.8) * isActive;
+        vec3 c1 = mix(vec3(1.55, 1.18, 0.85), vec3(1.10, 1.25, 1.70), rnd2.x * 0.5);
+        vec3 c2 = mix(vec3(1.05, 0.80, 1.45), vec3(1.55, 0.95, 0.75), rnd2.y * 0.5);
+
+        return (c1 * core * 1.7 + c2 * ring + vec3(1.0) * rays * 0.85) * isActive;
+      }
+
+      float rockBlob(vec2 uv, vec2 pos, float rad, float seed) {
+        vec2 p = uv - pos;
+        float d = length(p);
+        float n = fbm(p * 8.0 + seed * 3.0);
+        float edge = rad * (0.75 + 0.35 * n);
+        return 1.0 - smoothstep(edge, edge + 0.02, d);
       }
 
       void main() {
@@ -423,59 +468,98 @@
         float aspect = uRes.x / uRes.y;
         float r = length(uv);
 
-        float t = uTime * 0.05;
-        vec2 guv = rot(t) * uv;
+        vec2 sceneUv = uv / uZoom;
 
-        vec3 col = vec3(0.004, 0.006, 0.018);
-        col += vec3(0.003, 0.004, 0.010) * (1.0 - smoothstep(0.0, 1.5, r));
+        float t = uTime * 0.035;
+        vec2 guv = rot(-0.18) * sceneUv;
+        guv = rot(t) * guv;
 
-        float band = exp(-pow(abs(guv.y * 0.88 + guv.x * 0.22), 2.0) * 3.0);
-        vec2 corePos = guv - vec2(-0.18, 0.02);
-        float core = exp(-dot(corePos, corePos) * 2.1);
+        vec3 col = vec3(0.003, 0.004, 0.012);
+        col += vec3(0.004, 0.006, 0.014) * (1.0 - smoothstep(0.0, 1.6, r));
 
-        vec2 p1 = rot(0.22 + t * 0.55) * (guv * 1.75);
-        vec2 p2 = rot(-0.30 + t * 0.24) * (guv * 2.5);
-        float dust = pow(fbm(p1 * 1.8) * fbm(p2 * 1.0 + 17.0), 1.35);
-        float fil = smoothstep(0.45, 0.82, fbm(guv * 5.2));
+        vec2 gp = guv * 1.25;
+        float gr = length(gp);
 
-        float neb = band * (0.08 + 0.60 * dust) + core * 0.42;
-        vec3 nebCol = palette(clamp(0.15 + neb * 0.95 + core * 0.20, 0.0, 1.0));
-        col += nebCol * neb * 0.95 * uNebula;
-        col += vec3(0.10, 0.09, 0.16) * fil * band * 0.06 * uNebula;
+        float bulge = exp(-gr * gr * 5.2);
+        float core = exp(-gr * gr * 18.0);
 
-        float darkDust = smoothstep(0.38, 0.76, fbm(guv * 4.0 - vec2(0.0, t * 0.22))) * band;
-        col *= 1.0 - darkDust * 0.18 * uNebula;
+        float arm1 = spiralMask(gp, 2.0, 8.5, 0.15, 0.0);
+        float arm2 = spiralMask(gp, 2.0, 8.5, 0.15, PI);
+        float arms = max(arm1, arm2);
+        arms *= smoothstep(1.05, 0.10, gr);
 
-        float dn = smoothstep(0.5, 3.0, uStars);
-        col += starField(uv, 120.0, mix(0.9984, 0.9956, dn), 1.0, 11.0);
-        col += starField(uv, 200.0, mix(0.9990, 0.9964, dn), 0.85, 23.0);
-        col += starField(uv, 300.0, mix(0.9993, 0.9971, dn), 0.70, 37.0);
-        col += starField(uv + vec2(0.003, -0.001), 170.0, mix(0.9980, 0.9948, dn), 1.0, 51.0) * mix(1.0, 1.9, band);
-        col += starField(uv + vec2(-0.002, 0.002), 260.0, mix(0.9988, 0.9960, dn), 0.82, 67.0) * mix(1.0, 1.9, band);
-        col += brightStar(uv, 38.0, mix(0.9995, 0.9986, dn), 101.0);
-        col += brightStar(uv, 62.0, mix(0.9997, 0.9990, dn), 151.0);
+        float feather = fbm(gp * 5.0 + vec2(0.0, t * 1.5));
+        float detail = fbm(gp * 11.0 - vec2(t * 0.8, 0.0));
+        float dust = fbm(gp * 7.0 + 8.0);
 
-        float micro = hash21(floor(uv * 620.0));
-        float microStars = smoothstep(mix(0.9997, 0.9989, dn), 1.0, micro) * (0.6 + 0.4 * sin(uTime * 1.7 + micro * 40.0));
-        col += vec3(0.82, 0.86, 1.0) * microStars * mix(0.45, 1.05, band);
+        float armGlow = arms * (0.45 + feather * 0.75 + detail * 0.35);
+        float blueMist = arms * smoothstep(0.25, 0.85, feather) * smoothstep(1.1, 0.25, gr);
+        float darkLanes = arms * smoothstep(0.35, 0.82, dust) * smoothstep(0.85, 0.20, gr);
+
+        vec3 warmCore = vec3(1.35, 1.08, 0.72) * bulge * 0.95;
+        vec3 hotCore = vec3(2.3, 1.95, 1.55) * core * 1.55;
+        vec3 armWarm = vec3(1.10, 0.82, 0.58) * armGlow * 0.75;
+        vec3 armBlue = vec3(0.48, 0.60, 1.10) * blueMist * 0.95;
+        vec3 halo = vec3(0.18, 0.22, 0.45) * exp(-gr * gr * 1.8) * 0.65;
+
+        col += halo;
+        col += (warmCore + hotCore + armWarm + armBlue) * uNebula;
+        col *= 1.0 - darkLanes * 0.35 * uNebula;
+
+        float spark = smoothstep(0.76, 1.0, detail) * arms * smoothstep(1.0, 0.15, gr);
+        col += vec3(1.25, 1.00, 0.78) * spark * 0.35 * uNebula;
+
+        float dn = smoothstep(1.0, 8.0, uStars);
+        float fieldBoost = mix(1.0, 2.8, dn);
+
+        col += starField(sceneUv, 110.0, mix(0.9985, 0.9925, dn), 1.00, 11.0) * fieldBoost;
+        col += starField(sceneUv, 180.0, mix(0.9990, 0.9945, dn), 0.90, 23.0) * fieldBoost;
+        col += starField(sceneUv, 280.0, mix(0.99935, 0.9962, dn), 0.70, 37.0) * fieldBoost;
+        col += starField(sceneUv, 420.0, mix(0.99960, 0.9970, dn), 0.52, 61.0) * fieldBoost;
+        col += starField(sceneUv, 620.0, mix(0.99978, 0.9979, dn), 0.38, 79.0) * fieldBoost;
+        col += starField(sceneUv, 920.0, mix(0.99990, 0.9987, dn), 0.28, 103.0) * fieldBoost;
+        col += brightStar(sceneUv, 35.0, mix(0.99955, 0.9979, dn), 101.0) * mix(1.0, 1.4, dn);
+        col += brightStar(sceneUv, 58.0, mix(0.99972, 0.9984, dn), 151.0) * mix(1.0, 1.4, dn);
+
+        float cluster = exp(-dot(sceneUv - vec2(0.15 * aspect / uZoom, -0.22 / uZoom), sceneUv - vec2(0.15 * aspect / uZoom, -0.22 / uZoom)) * 14.0 * uZoom);
+
+        float micro1 = hash21(floor(sceneUv * 900.0));
+        float micro2 = hash21(floor(sceneUv * 1400.0 + 33.7));
+        float micro3 = hash21(floor(sceneUv * 2100.0 - 71.2));
+        float micro4 = hash21(floor(sceneUv * 3000.0 + 121.9));
+
+        float m1 = smoothstep(mix(0.99978, 0.9979, dn), 1.0, micro1) * (0.60 + 0.40 * sin(uTime * 1.7 + micro1 * 40.0));
+        float m2 = smoothstep(mix(0.99986, 0.9984, dn), 1.0, micro2) * (0.58 + 0.42 * sin(uTime * 1.3 + micro2 * 32.0));
+        float m3 = smoothstep(mix(0.99992, 0.9988, dn), 1.0, micro3) * (0.55 + 0.45 * sin(uTime * 1.1 + micro3 * 27.0));
+        float m4 = smoothstep(mix(0.99996, 0.99915, dn), 1.0, micro4) * (0.50 + 0.50 * sin(uTime * 0.9 + micro4 * 21.0));
+
+        col += vec3(0.90, 0.93, 1.0) * m1 * (0.60 + cluster * 0.8 + arms * 0.45);
+        col += vec3(0.92, 0.95, 1.0) * m2 * (0.55 + arms * 0.40);
+        col += vec3(1.0, 0.96, 0.90) * m3 * (0.40 + bulge * 0.55);
+        col += vec3(0.82, 0.88, 1.0) * m4 * 0.35;
 
         if (uFx > 0.5) {
           col += shootingStar(uv, aspect) * 0.95;
-          col += supernova(uv, aspect) * 0.85;
+          col += supernova(sceneUv * uZoom, aspect) * 0.80;
         }
 
-        col += vec3(0.16, 0.13, 0.09) * pow(core, 1.8) * 0.16 * uNebula;
+        float rock1 = rockBlob(uv, vec2(-0.92 * aspect, -0.88), 0.12, 1.0);
+        float rock2 = rockBlob(uv, vec2(0.82 * aspect, -0.74), 0.10, 2.0);
+        float rock3 = rockBlob(uv, vec2(-0.52 * aspect, -0.42), 0.06, 3.0);
+        float rock4 = rockBlob(uv, vec2(1.02 * aspect, -0.10), 0.05, 4.0);
+        float rock5 = rockBlob(uv, vec2(-0.63 * aspect, -0.58), 0.035, 5.0);
+        float rockMask = max(max(rock1, rock2), max(max(rock3, rock4), rock5));
+        vec3 rockCol = vec3(0.10, 0.08, 0.08) + vec3(0.18, 0.15, 0.14) * smoothstep(0.2, 0.9, fbm(uv * 12.0 + 4.0));
+        col = mix(col, rockCol, rockMask * 0.95);
 
-        float vign = 1.0 - smoothstep(0.35, 1.45, r);
+        float vign = 1.0 - smoothstep(0.35, 1.6, r);
         col *= max(vign, 0.0);
 
-        col = 1.0 - exp(-col * 1.18);
-        col = pow(col, vec3(0.95));
+        col = 1.0 - exp(-col * 1.05);
+        col = pow(col, vec3(0.92));
 
         o = vec4(col, 1.0);
       }`;
-
-      runSelfChecks(FS);
 
       let prog;
       try {
@@ -507,6 +591,7 @@
       const uTimeLoc = gl.getUniformLocation(prog, 'uTime');
       const uNebulaLoc = gl.getUniformLocation(prog, 'uNebula');
       const uStarsLoc = gl.getUniformLocation(prog, 'uStars');
+      const uZoomLoc = gl.getUniformLocation(prog, 'uZoom');
       const uFxLoc = gl.getUniformLocation(prog, 'uFx');
 
       const t0 = performance.now();
@@ -525,6 +610,7 @@
         gl.uniform1f(uTimeLoc, time);
         gl.uniform1f(uNebulaLoc, settings.nebula);
         gl.uniform1f(uStarsLoc, settings.stars);
+        gl.uniform1f(uZoomLoc, settings.zoom);
         gl.uniform1f(uFxLoc, settings.fx);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         gl.bindVertexArray(null);
