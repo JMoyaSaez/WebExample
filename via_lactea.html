@@ -1,15 +1,163 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Vía Láctea (WebGL2)</title>
   <style>
-    html,body{margin:0;height:100%;overflow:hidden;background:#000}
-    canvas{width:100vw;height:100vh;display:block}
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+
+    #uiToggle {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(10, 10, 18, 0.55);
+      color: #d7d9e4;
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      user-select: none;
+      z-index: 20;
+    }
+
+    #panel {
+      position: fixed;
+      top: 56px;
+      right: 14px;
+      width: 260px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(10, 10, 18, 0.58);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #e7e8ef;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      z-index: 20;
+    }
+
+    #panel.hidden {
+      display: none;
+    }
+
+    .title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+      color: #f0f2ff;
+    }
+
+    .row {
+      margin-bottom: 14px;
+    }
+
+    .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .rowHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #d7d9e4;
+    }
+
+    .value {
+      font-variant-numeric: tabular-nums;
+      color: #ffffff;
+      opacity: 0.95;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.10);
+    }
+
+    .checkRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #d7d9e4;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(230,235,255,0.65);
+    }
   </style>
 </head>
 <body>
   <canvas id="space"></canvas>
+
+  <div id="uiToggle">✦</div>
+
+  <div id="panel">
+    <div class="title">Vía Láctea</div>
+
+    <div class="row">
+      <div class="rowHeader">
+        <span>Intensidad nebulosa</span>
+        <span id="nebulaValue" class="value">0.65</span>
+      </div>
+      <input id="nebulaSlider" type="range" min="0" max="1.5" step="0.01" value="0.65" />
+    </div>
+
+    <div class="row">
+      <div class="rowHeader">
+        <span>Densidad de estrellas</span>
+        <span id="starsValue" class="value">1.45</span>
+      </div>
+      <input id="starsSlider" type="range" min="0.4" max="2.5" step="0.01" value="1.45" />
+    </div>
+
+    <div class="row checkRow">
+      <span>Efectos ocasionales</span>
+      <input id="fxToggle" type="checkbox" checked />
+    </div>
+
+    <div class="hint">
+      Nebulosa más baja = menos “nube”.<br>
+      Las estrellas fugaces y supernovas aparecen de vez en cuando.
+    </div>
+  </div>
+
   <script src="./via_lactea.js"></script>
 </body>
 </html>
