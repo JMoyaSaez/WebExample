@@ -56,15 +56,15 @@ canvas{width:100vw;height:100vh;display:block}
   <div class="value" id="rotVal">0.00</div>
 
   <label>Velocidad giro</label>
-  <input type="range" id="speed" min="-0.25" max="0.25" step="0.001" value="0.04">
-  <div class="value" id="speedVal">0.040</div>
+  <input type="range" id="speed" min="-0.08" max="0.08" step="0.001" value="0.015">
+  <div class="value" id="speedVal">0.015</div>
 
   <label>Inclinación</label>
-  <input type="range" id="tilt" min="-0.35" max="0.35" step="0.01" value="0">
+  <input type="range" id="tilt" min="-0.22" max="0.22" step="0.01" value="0">
   <div class="value" id="tiltVal">0.00</div>
 
   <label>Zoom</label>
-  <input type="range" id="zoom" min="0.80" max="1.35" step="0.01" value="1.00">
+  <input type="range" id="zoom" min="0.88" max="1.22" step="0.01" value="1.00">
   <div class="value" id="zoomVal">1.00</div>
 </div>
 
@@ -88,6 +88,9 @@ function compile(type, src){
   const s = gl.createShader(type);
   gl.shaderSource(s, src);
   gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+    console.error(gl.getShaderInfoLog(s));
+  }
   return s;
 }
 
@@ -96,6 +99,9 @@ function program(vs, fs){
   gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
   gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
   gl.linkProgram(p);
+  if(!gl.getProgramParameter(p, gl.LINK_STATUS)){
+    console.error(gl.getProgramInfoLog(p));
+  }
   return p;
 }
 
@@ -179,7 +185,8 @@ float ring(vec2 uv, vec2 p, float radius, float width){
 float segmentGlow(vec2 p, vec2 a, vec2 b, float thickness){
   vec2 pa = p - a;
   vec2 ba = b - a;
-  float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+  float denom = max(dot(ba, ba), 0.0001);
+  float h = clamp(dot(pa, ba) / denom, 0.0, 1.0);
   float d = length(pa - ba * h);
   return exp(-pow(d / thickness, 2.0));
 }
@@ -187,116 +194,108 @@ float segmentGlow(vec2 p, vec2 a, vec2 b, float thickness){
 void main(){
   vec2 uv = vUv * 2.0 - 1.0;
   uv.x *= uRes.x / uRes.y;
-
   uv *= uZoom;
 
-  float r = length(uv);
-  float rr = clamp(r, 0.0, 1.6);
+  // Rotación global muy suave, sin deformar la galaxia con el tiempo
+  float sceneRot = uRot + uTime * uSpeed;
+  uv = rot(sceneRot) * uv;
 
-  // Rotación base calmada
-  float speedFactor = pow(clamp(rr / 1.6, 0.0, 1.0), 0.75);
-  float radialMultiplier = mix(0.08, 0.42, speedFactor);
-  float dynamicRot = uRot + uTime * uSpeed * radialMultiplier;
-
-  uv = rot(dynamicRot) * uv;
-
-  // Torsión suave
-  float twist = rr * 0.45;
+  // Ligera torsión fija para insinuar brazos, pero estable
+  float r0 = length(uv);
+  float twist = clamp(r0, 0.0, 1.5) * 0.10;
   uv = rot(twist) * uv;
 
   uv.y += uTilt;
 
+  float r = length(uv);
+
   vec3 col = vec3(0.01, 0.015, 0.03);
 
-  float band = exp(-pow(abs(uv.y * 0.82 + uv.x * 0.22), 2.0) * 2.0);
-  float core = exp(-r * r * 1.45);
+  float band = exp(-pow(abs(uv.y * 0.86 + uv.x * 0.18), 2.0) * 2.3);
+  float core = exp(-r * r * 1.55);
 
-  vec2 p = uv * 1.6;
-  float dust = fbm(p + fbm(p * 0.5));
-  dust = smoothstep(0.3, 0.8, dust);
+  vec2 p = uv * 1.55;
+  float dust = fbm(p + fbm(p * 0.55));
+  dust = smoothstep(0.32, 0.82, dust);
 
-  float neb = band * (0.2 + 0.8 * dust);
+  float neb = band * (0.18 + 0.82 * dust);
 
   vec3 nebCol = mix(
-    vec3(0.08, 0.12, 0.25),
-    vec3(0.4, 0.5, 0.9),
+    vec3(0.08, 0.12, 0.24),
+    vec3(0.38, 0.50, 0.92),
     dust
   );
 
-  nebCol += core * vec3(0.8, 0.7, 0.5) * 0.2;
+  nebCol += core * vec3(0.85, 0.72, 0.55) * 0.18;
   col += nebCol * neb;
 
-  // Estrellas fondo
+  // Estrellas de fondo
   vec2 st = uv * 220.0;
   float h = hash21(floor(st));
   float star = smoothstep(0.995, 1.0, h);
-  star *= 0.7 + 0.3 * sin(uTime * 1.6 + h * 6.28);
-  col += vec3(1.2, 1.15, 1.05) * star * 1.35;
+  star *= 0.72 + 0.28 * sin(uTime * 1.4 + h * 6.2831);
+  col += vec3(1.2, 1.15, 1.05) * star * 1.25;
 
-  // -----------------------------
   // SUPERNOVA ocasional
-  // -----------------------------
-  float snCycle = 17.0;
+  float snCycle = 20.0;
   float snId = floor((uTime + 4.0) / snCycle);
   float snT = fract((uTime + 4.0) / snCycle);
 
   vec2 snSeed = hash21f(snId * 3.17 + 1.73);
   vec2 snPos = vec2(
-    mix(-0.65, 0.65, snSeed.x),
-    mix(-0.25, 0.25, snSeed.y)
+    mix(-0.60, 0.60, snSeed.x),
+    mix(-0.22, 0.22, snSeed.y)
   );
 
-  float snGate = step(0.18, hash11(snId * 1.37));
-  float snLife = smoothstep(0.04, 0.16, snT) * (1.0 - smoothstep(0.34, 0.62, snT));
-  float snFlash = exp(-pow(snT - 0.11, 2.0) / 0.0018);
-  float snRing = ring(uv, snPos, snT * 1.35, 0.028 + snT * 0.04);
-  float snCore = glowCircle(uv, snPos, 0.0, 0.04 + snT * 0.12);
-  float snHalo = glowCircle(uv, snPos, 0.0, 0.15 + snT * 0.28);
+  float snGate = step(0.28, hash11(snId * 1.37));
+  float snLife = smoothstep(0.05, 0.13, snT) * (1.0 - smoothstep(0.26, 0.48, snT));
+  float snFlash = exp(-pow(snT - 0.10, 2.0) / 0.0015);
+  float snRing = ring(uv, snPos, snT * 1.00, 0.022 + snT * 0.03);
+  float snCore = glowCircle(uv, snPos, 0.0, 0.035 + snT * 0.08);
+  float snHalo = glowCircle(uv, snPos, 0.0, 0.10 + snT * 0.18);
 
-  vec3 snColor = mix(vec3(1.0, 0.85, 0.65), vec3(0.7, 0.85, 1.2), snSeed.x);
-  col += snGate * snLife * snColor * snHalo * 0.35;
-  col += snGate * snFlash * snColor * snCore * 1.4;
-  col += snGate * snLife * snColor * snRing * 0.9;
+  vec3 snColor = mix(vec3(1.0, 0.86, 0.68), vec3(0.72, 0.86, 1.18), snSeed.x);
+  col += snGate * snLife * snColor * snHalo * 0.22;
+  col += snGate * snFlash * snColor * snCore * 1.15;
+  col += snGate * snLife * snColor * snRing * 0.60;
 
-  // -----------------------------
-  // COLISIÓN ESTELAR ocasional
-  // -----------------------------
-  float colCycle = 23.0;
+  // Colisión estelar ocasional
+  float colCycle = 26.0;
   float colId = floor((uTime + 9.0) / colCycle);
   float colT = fract((uTime + 9.0) / colCycle);
 
   vec2 cSeed = hash21f(colId * 5.11 + 8.2);
-  float yBand = mix(-0.18, 0.18, cSeed.y);
-  vec2 a0 = vec2(-1.15, yBand - 0.08);
-  vec2 b0 = vec2( 1.15, yBand + 0.08);
+  float yBand = mix(-0.16, 0.16, cSeed.y);
+  vec2 a0 = vec2(-1.00, yBand - 0.06);
+  vec2 b0 = vec2( 1.00, yBand + 0.06);
 
-  float tMove = smoothstep(0.05, 0.42, colT);
+  float tMove = smoothstep(0.08, 0.38, colT);
   vec2 pa = mix(a0, vec2(0.0, yBand), tMove);
   vec2 pb = mix(b0, vec2(0.0, yBand), tMove);
 
-  float collideGate = step(0.28, hash11(colId * 0.93 + 2.0));
+  float collideGate = step(0.36, hash11(colId * 0.93 + 2.0));
 
-  float starA = glowCircle(uv, pa, 0.0, 0.018);
-  float starB = glowCircle(uv, pb, 0.0, 0.018);
+  float starA = glowCircle(uv, pa, 0.0, 0.014);
+  float starB = glowCircle(uv, pb, 0.0, 0.014);
 
-  float trailA = segmentGlow(uv, a0, pa, 0.012) * 0.45;
-  float trailB = segmentGlow(uv, b0, pb, 0.012) * 0.45;
+  float trailA = segmentGlow(uv, a0, pa, 0.010) * 0.25;
+  float trailB = segmentGlow(uv, b0, pb, 0.010) * 0.25;
 
-  float impact = exp(-pow(colT - 0.46, 2.0) / 0.0025);
-  float shock = ring(uv, vec2(0.0, yBand), max(0.0, (colT - 0.46) * 1.8), 0.022);
-  shock *= smoothstep(0.46, 0.50, colT) * (1.0 - smoothstep(0.62, 0.78, colT));
+  float impact = exp(-pow(colT - 0.42, 2.0) / 0.0022);
+  float shock = ring(uv, vec2(0.0, yBand), max(0.0, (colT - 0.42) * 1.2), 0.018);
+  shock *= smoothstep(0.42, 0.47, colT) * (1.0 - smoothstep(0.58, 0.72, colT));
 
-  float impactGlow = glowCircle(uv, vec2(0.0, yBand), 0.0, 0.05 + max(0.0, colT - 0.46) * 0.16);
+  float impactGlow = glowCircle(uv, vec2(0.0, yBand), 0.0, 0.04 + max(0.0, colT - 0.42) * 0.10);
 
-  col += collideGate * vec3(1.05, 0.95, 0.85) * (starA + starB) * 0.8;
-  col += collideGate * vec3(0.7, 0.85, 1.2) * (trailA + trailB) * 0.45;
-  col += collideGate * vec3(1.25, 0.95, 0.75) * impact * impactGlow * 1.6;
-  col += collideGate * vec3(0.9, 0.95, 1.2) * shock * 0.95;
+  col += collideGate * vec3(1.04, 0.96, 0.88) * (starA + starB) * 0.58;
+  col += collideGate * vec3(0.70, 0.86, 1.18) * (trailA + trailB) * 0.24;
+  col += collideGate * vec3(1.20, 0.96, 0.76) * impact * impactGlow * 1.00;
+  col += collideGate * vec3(0.88, 0.95, 1.15) * shock * 0.55;
 
-  float vign = smoothstep(1.25, 0.18, r);
+  float vign = smoothstep(1.22, 0.18, r);
   col *= vign;
 
-  col = 1.0 - exp(-col * 1.25);
+  col = 1.0 - exp(-col * 1.22);
 
   o = vec4(col, 1.0);
 }
@@ -330,14 +329,14 @@ const target = {
   rot: 0,
   tilt: 0,
   zoom: 1,
-  speed: 0.04
+  speed: 0.015
 };
 
 const current = {
   rot: 0,
   tilt: 0,
   zoom: 1,
-  speed: 0.04
+  speed: 0.015
 };
 
 function lerp(a,b,t){ return a + (b-a)*t; }
@@ -371,7 +370,7 @@ function frame(now){
   current.rot   = lerp(current.rot,   target.rot,   0.08);
   current.tilt  = lerp(current.tilt,  target.tilt,  0.08);
   current.zoom  = lerp(current.zoom,  target.zoom,  0.08);
-  current.speed = lerp(current.speed, target.speed, 0.06);
+  current.speed = lerp(current.speed, target.speed, 0.05);
 
   gl.useProgram(prog);
   gl.bindVertexArray(vao);
