@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf9ff">
+  <meta name="description" content="TechLab Workshops: demostración educativa de una web de reservas responsive con HTML5, CSS3 y JavaScript accesible.">
+  <title>TechLab Workshops · Reserva tu plaza</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+  <div class="demo-strip" role="note">
+    <span class="demo-badge"><span class="demo-dot"></span> DEMO HCI · UNIDAD 8</span>
+    <span>Reservas de ejemplo: esta web no envía ni almacena datos personales.</span>
+    <a href="#laboratorio">Ver retos de la práctica</a>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#inicio" aria-label="TechLab Workshops, ir al inicio">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none"><path d="M19 7h10M22 7v14L11 37a5 5 0 0 0 4 7h18a5 5 0 0 0 4-7L26 21V7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 33h14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="37" r="2" fill="currentColor"/><circle cx="28" cy="29" r="2" fill="currentColor"/></svg>
+        </span>
+        <span class="brand-word">TechLab <span>Workshops</span></span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="main-nav" id="mainNav" aria-label="Navegación principal">
+        <a class="current" href="#talleres">Talleres</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#laboratorio">Laboratorio HCI</a>
+        <a href="#faq">Preguntas frecuentes</a>
+      </nav>
+      <a class="header-cta" href="#reserva">Reservar plaza</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <div class="container main-layout">
+      <div class="main-content">
+        <section class="hero" id="inicio" aria-labelledby="heroTitle">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="sparkle">✦</span> TU PRÓXIMA GRAN IDEA EMPIEZA AQUÍ</p>
+            <h1 id="heroTitle">Aprende.<br><span>Crea. Conecta.</span></h1>
+            <p class="hero-description">Talleres prácticos de tecnología para desarrollar habilidades reales, crear proyectos y compartir ideas con personas como tú.</p>
+            <div class="hero-chips" aria-label="Ventajas de los talleres">
+              <span class="chip chip-purple"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 17v3" stroke="currentColor" stroke-width="2"/></svg> Práctica real</span>
+              <span class="chip chip-blue"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="2"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 6a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Plazas limitadas</span>
+              <span class="chip chip-orange"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 2 5 13h6l-1 9 9-12h-6l1-8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> Proyectos reales</span>
+            </div>
+          </div>
+          <div class="hero-illustration" aria-hidden="true">
+            <span class="float-cube cube-one"></span><span class="float-cube cube-two"></span><span class="float-cube cube-three"></span>
+            <span class="hero-orbit"></span>
+            <div class="computer">
+              <div class="computer-screen"><div class="screen-top"><i></i><i></i><i></i></div><div class="screen-mark">&lt;/&gt;</div><div class="screen-lines"><b></b><b></b><b></b></div></div>
+              <div class="computer-base"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workshops-section" id="talleres" aria-labelledby="workshopsTitle">
+          <div class="section-header">
+            <div>
+              <p class="section-kicker">FORMACIÓN CON PROPÓSITO</p>
+              <h2 id="workshopsTitle">Elige tu taller</h2>
+            </div>
+            <span class="workshop-count">3 talleres disponibles</span>
+          </div>
+          <div class="workshops-grid" id="workshopsGrid">
+            <article class="workshop-card" data-workshop="html" aria-labelledby="title-html">
+              <div class="art art-html" aria-hidden="true">
+                <span class="art-circle"></span>
+                <svg class="art-icon html-shield" viewBox="0 0 140 150" fill="none"><path d="M24 10h92l-8 108-38 22-38-22L24 10Z" fill="#F36A29"/><path d="M70 128 101 110l7-90H70v108Z" fill="#E75020"/><path d="M46 43h48l-2 13H59l1 13h30l-5 34-15 9-16-9-1-15h14l1 7 4 3 5-3 2-13H48l-5-39Z" fill="white"/></svg>
+                <span class="art-floor"></span>
+              </div>
+              <div class="workshop-content">
+                <span class="workshop-category orange-text">DESARROLLO WEB</span>
+                <h3 id="title-html">HTML5 desde cero</h3>
+                <p>Construye páginas web semánticas y modernas con una base sólida.</p>
+                <div class="workshop-meta"><span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg> 4 dic. 2026</span><span>·</span><span>18:00 h</span></div>
+                <button class="pick-button" type="button" data-pick="html" aria-pressed="false" aria-label="Elegir taller HTML5 desde cero">Elegir taller</button>
+              </div>
+            </article>
+
+            <article class="workshop-card" data-workshop="ux" aria-labelledby="title-ux">
+              <div class="art art-ux" aria-hidden="true">
+                <span class="art-circle"></span>
+                <svg class="art-icon ux-window" viewBox="0 0 180 144" fill="none"><rect x="17" y="17" width="147" height="109" rx="14" fill="#693AF5"/><rect x="25" y="25" width="131" height="92" rx="9" fill="#AC84FF"/><path d="M25 43h131" stroke="#EEE7FF" stroke-width="4"/><circle cx="36" cy="34" r="3" fill="#EEE7FF"/><circle cx="48" cy="34" r="3" fill="#EEE7FF"/><circle cx="60" cy="34" r="3" fill="#EEE7FF"/><rect x="38" y="57" width="68" height="43" rx="7" fill="#D9CBFF"/><path d="m43 90 21-22 15 13 12-9 10 19H43Z" fill="#9D76FF"/><path d="m116 76 23 10-9 4-3 10-11-24Z" fill="#5430C7" stroke="white" stroke-width="3"/></svg>
+                <span class="art-floor"></span>
+              </div>
+              <div class="workshop-content">
+                <span class="workshop-category purple-text">EXPERIENCIA DE USUARIO</span>
+                <h3 id="title-ux">Diseño UX aplicado</h3>
+                <p>Diseña experiencias intuitivas, atractivas y accesibles.</p>
+                <div class="workshop-meta"><span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg> 11 dic. 2026</span><span>·</span><span>18:00 h</span></div>
+                <button class="pick-button" type="button" data-pick="ux" aria-pressed="false" aria-label="Elegir taller Diseño UX aplicado">Elegir taller</button>
+              </div>
+            </article>
+
+            <article class="workshop-card selected" data-workshop="ai" aria-labelledby="title-ai">
+              <div class="art art-ai" aria-hidden="true">
+                <span class="art-circle"></span>
+                <svg class="art-icon ai-chip" viewBox="0 0 180 144" fill="none"><rect x="36" y="18" width="108" height="108" rx="23" fill="#2D9DDC"/><rect x="46" y="28" width="88" height="88" rx="16" fill="#3EBAFC"/><rect x="57" y="39" width="66" height="66" rx="10" fill="#1747B8"/><path d="M16 49h23M16 74h23M16 99h23M141 49h23M141 74h23M141 99h23M64 3v20M90 3v20M116 3v20M64 121v20M90 121v20M116 121v20" stroke="#107DD5" stroke-width="11" stroke-linecap="round"/><path d="m70 91 12-37h8l13 37M75 80h23M110 54v37" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="art-floor"></span>
+              </div>
+              <div class="workshop-content">
+                <span class="workshop-category blue-text">INTELIGENCIA ARTIFICIAL</span>
+                <h3 id="title-ai">IA aplicada</h3>
+                <p>Descubre herramientas de IA y utilízalas en proyectos reales.</p>
+                <div class="workshop-meta"><span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg> 18 dic. 2026</span><span>·</span><span>18:00 h</span></div>
+                <button class="pick-button" type="button" data-pick="ai" aria-pressed="true" aria-label="Taller IA aplicada seleccionado">Seleccionado <span aria-hidden="true">✓</span></button>
+              </div>
+            </article>
+          </div>
+          <p id="selectionLive" class="sr-only" role="status" aria-live="polite">Taller IA aplicada seleccionado.</p>
+        </section>
+
+        <section class="steps-section" id="como-funciona" aria-labelledby="stepsTitle">
+          <div class="section-header">
+            <div><p class="section-kicker">UN PROCESO SENCILLO</p><h2 id="stepsTitle">¿Cómo funciona?</h2></div>
+          </div>
+          <div class="steps">
+            <div class="step"><span class="step-icon">01</span><div><h3>Elige tu taller</h3><p>Explora las opciones y selecciona la que más te interese.</p></div></div>
+            <div class="step"><span class="step-icon">02</span><div><h3>Completa el formulario</h3><p>Introduce tus datos y comprueba que estén correctos.</p></div></div>
+            <div class="step"><span class="step-icon">03</span><div><h3>Recibe confirmación</h3><p>La demo mostrará un resumen de tu reserva ficticia.</p></div></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="booking-aside" id="reserva" aria-labelledby="bookingTitle">
+        <div class="booking-panel">
+          <div class="panel-heading">
+            <span class="calendar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 3v4M17 3v4M3 10h18" stroke="currentColor" stroke-width="2"/></svg></span>
+            <div><p class="section-kicker">INSCRIPCIÓN SIMULADA</p><h2 id="bookingTitle">Reserva tu plaza</h2></div>
+          </div>
+          <p class="booking-intro">Completa tus datos para reservar el taller seleccionado. Todos los campos son obligatorios.</p>
+
+          <form id="bookingForm" novalidate>
+            <div class="field">
+              <label for="fullName">Nombre completo <span class="required" aria-label="obligatorio">*</span></label>
+              <input type="text" id="fullName" name="fullName" autocomplete="name" placeholder="Ej. Laura Gómez" minlength="2" maxlength="80" required aria-describedby="nameHint nameError">
+              <small class="field-hint" id="nameHint">Introduce al menos 2 caracteres.</small>
+              <p class="field-error" id="nameError" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="email">Correo electrónico <span class="required" aria-label="obligatorio">*</span></label>
+              <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="laura@ejemplo.es" required aria-describedby="emailError">
+              <p class="field-error" id="emailError" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="workshopSelect">Taller seleccionado <span class="required" aria-label="obligatorio">*</span></label>
+              <div class="select-wrap"><select id="workshopSelect" name="workshop" required aria-describedby="workshopHint">
+                <option value="html">HTML5 desde cero · 4 dic.</option>
+                <option value="ux">Diseño UX aplicado · 11 dic.</option>
+                <option value="ai" selected>IA aplicada · 18 dic.</option>
+              </select></div>
+              <small class="field-hint" id="workshopHint">Puedes cambiar el taller aquí o en las tarjetas.</small>
+            </div>
+            <div class="booking-summary" aria-label="Resumen de la reserva">
+              <span class="summary-icon" id="summaryIcon" aria-hidden="true">✦</span>
+              <div><b id="summaryTitle">IA aplicada</b><small id="summaryDate">18 diciembre 2026 · 18:00 h</small></div>
+              <span class="summary-free">Gratis</span>
+            </div>
+            <button class="submit-button" id="submitButton" type="submit">Confirmar reserva <span class="button-check" aria-hidden="true">✓</span></button>
+            <p class="privacy-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg> Simulación local. No se envía información a ningún servidor.</p>
+          </form>
+
+          <section class="confirmation" id="confirmation" hidden aria-labelledby="confirmationTitle" role="status">
+            <div class="success-icon" aria-hidden="true">✓</div>
+            <h3 id="confirmationTitle" tabindex="-1">¡Reserva confirmada!</h3>
+            <p>Has completado correctamente el proceso de ejemplo.</p>
+            <div class="ticket"><span>RESUMEN DE TU RESERVA</span><strong id="confirmedWorkshop">IA aplicada</strong><p id="confirmedDate">18 diciembre 2026 · 18:00 h</p><p>A nombre de <b id="confirmedName"></b></p><div class="ticket-code" id="referenceCode"></div></div>
+            <button class="submit-button" id="newBooking" type="button">Hacer otra reserva</button>
+          </section>
+        </div>
+        <div class="booking-aside-note"><span>✳</span><p>Diseño pensado para practicar <b>HCI, accesibilidad y responsive.</b></p></div>
+      </aside>
+    </div>
+
+    <section class="qa-section" id="laboratorio" aria-labelledby="qaTitle">
+      <div class="container qa-layout">
+        <div class="qa-header">
+          <p class="section-kicker">PARA LA ACTIVIDAD DE HCI</p>
+          <h2 id="qaTitle">Laboratorio de experiencia de usuario</h2>
+          <p>Abre las herramientas de desarrollo y comprueba si la interfaz resuelve estos cuatro escenarios. Puedes usar este sitio como referencia para tu propio proyecto.</p>
+          <span class="qa-time">Práctica sugerida: 30 minutos</span>
+        </div>
+        <div class="qa-grid">
+          <article class="qa-card"><span class="qa-number">A</span><h3>Adaptación responsive</h3><p>Reduce la pantalla a 390 px. Las tarjetas deben apilarse y los campos ocupar el ancho disponible.</p><span class="qa-tag">CSS Grid · Responsive</span></article>
+          <article class="qa-card"><span class="qa-number">B</span><h3>Errores comprensibles</h3><p>Prueba a confirmar con los campos vacíos o un correo incorrecto. Observa el mensaje y el foco.</p><span class="qa-tag">Validación · Feedback</span></article>
+          <article class="qa-card"><span class="qa-number">C</span><h3>Navegación por teclado</h3><p>Usa Tab, Enter y las flechas en el selector. Todas las acciones deben ser operables sin ratón.</p><span class="qa-tag">Accesibilidad · Foco</span></article>
+          <article class="qa-card"><span class="qa-number">D</span><h3>Confirmación de acciones</h3><p>Completa una reserva con datos ficticios. La web debe mostrar qué se ha reservado y permitir empezar de nuevo.</p><span class="qa-tag">Estados · Prevención de errores</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section container" id="faq" aria-labelledby="faqTitle">
+      <div><p class="section-kicker">DUDAS FRECUENTES</p><h2 id="faqTitle">Preguntas frecuentes</h2><p>Este proyecto es una demostración de desarrollo frontend. Los eventos y las reservas son ficticios.</p></div>
+      <div class="faq-list">
+        <details><summary>¿La reserva es real?</summary><p>No. Al pulsar «Confirmar reserva», JavaScript valida los datos y muestra una confirmación local. No hay backend ni se envía información a terceros.</p></details>
+        <details><summary>¿Puedo probar la web en el móvil?</summary><p>Sí. La interfaz se adapta automáticamente al ancho disponible. Puedes comprobarlo desde un teléfono o mediante el modo dispositivo de las herramientas del navegador.</p></details>
+        <details><summary>¿Qué tecnologías utiliza?</summary><p>HTML5 semántico, CSS3 con Grid y Flexbox, y JavaScript nativo para selección, validación y confirmación. No necesita instalar dependencias.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><div><b>✳ TechLab Workshops</b><p>Proyecto didáctico de HCI · eUniv · Unidad 8</p></div><div><a href="#inicio">Volver arriba</a><span>HTML5 · CSS3 · JavaScript</span></div></div></footer>
+</body>
+</html>
