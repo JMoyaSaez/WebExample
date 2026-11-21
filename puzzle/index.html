@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#161b39" />
+    <meta name="description" content="Puzzle UX Lab: una práctica de HTML5, CSS3, JavaScript, Drag and Drop y accesibilidad de la Unidad 9 de HCI." />
+    <title>Puzzle UX Lab · Unidad 9 HCI</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#tablero">Saltar al tablero</a>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="#inicio" aria-label="Puzzle UX Lab, inicio">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-text"><strong>Puzzle<span>UX</span></strong><small>LABORATORIO HCI</small></span>
+        </a>
+        <div class="header-right"><span class="header-course">UNIDAD 09 <span aria-hidden="true">/</span> HTML5 + CSS3 + JS</span><a class="header-help" href="#laboratorio">Guía de la práctica</a></div>
+      </div>
+    </header>
+
+    <main id="inicio">
+      <div class="page-shell">
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> APRENDE HACIENDO</span>
+            <h1 id="page-title">Un puzzle. <em>Muchas formas</em><br />de mejorar la experiencia.</h1>
+            <p>Construye una buena experiencia de usuario mientras juegas. Carga una imagen, resuelve el puzzle y observa cómo el feedback hace que cada interacción sea más clara.</p>
+          </div>
+          <div class="intro-stamp" aria-hidden="true"><span class="stamp-icon">✳</span><strong>HTML5</strong><span>INTERACTIVO</span></div>
+        </section>
+
+        <div class="workspace">
+          <section class="game-panel" aria-labelledby="game-title">
+            <div class="game-head">
+              <div>
+                <span class="panel-kicker">TU PARTIDA</span>
+                <h2 id="game-title">Zona de juego <span aria-hidden="true">✦</span></h2>
+              </div>
+              <div id="gameStatus" class="game-status"><span class="status-dot" aria-hidden="true"></span><span id="gameStatusText">Listo para jugar</span></div>
+            </div>
+
+            <div class="stats" aria-label="Estadísticas de la partida">
+              <div class="stat">
+                <div class="stat-label"><span class="stat-symbol" aria-hidden="true">◷</span> Tiempo</div>
+                <output id="timer" class="stat-value" aria-label="Tiempo transcurrido">00:00</output>
+              </div>
+              <div class="stat">
+                <div class="stat-label"><span class="stat-symbol" aria-hidden="true">↗</span> Movimientos</div>
+                <output id="moves" class="stat-value" aria-label="Movimientos realizados">0</output>
+              </div>
+              <div class="stat stat-progress">
+                <div class="stat-label"><span class="stat-symbol" aria-hidden="true">◎</span> Piezas correctas</div>
+                <output id="correctCount" class="stat-value" aria-label="Piezas en su posición">0 / 9</output>
+              </div>
+            </div>
+
+            <div class="board-frame">
+              <div class="board-topline"><span>RECONSTRUYE LA IMAGEN</span><span id="boardDifficulty">3 × 3</span></div>
+              <div id="tablero" class="board-wrapper">
+                <div id="puzzle" class="puzzle-grid" role="group" aria-label="Tablero del puzzle" aria-describedby="boardHelp"></div>
+              </div>
+              <div class="board-progress"><progress id="progress" max="9" value="0" aria-label="Piezas en su posición correcta"></progress></div>
+              <p id="boardHelp" class="board-help">Arrastra una pieza sobre otra, o selecciona dos piezas con clic, toque o Enter para intercambiarlas. Usa las flechas para moverte por el tablero.</p>
+              <div class="game-actions">
+                <button id="restartBtn" class="button button-primary" type="button"><span aria-hidden="true">↻</span> Nueva mezcla</button>
+                <button id="previewBtn" class="button button-outline" type="button"><span aria-hidden="true">◧</span> Ver imagen original</button>
+              </div>
+              <p id="statusMessage" class="interaction-message" role="status" aria-live="polite" aria-atomic="true">Selecciona dos piezas para empezar.</p>
+            </div>
+
+            <section id="victory" class="victory" aria-labelledby="victoryTitle" hidden>
+              <div class="victory-medal" aria-hidden="true">★</div>
+              <div>
+                <h3 id="victoryTitle" tabindex="-1">¡Puzzle completado!</h3>
+                <p>Has resuelto el reto en <strong id="finalTime">00:00</strong> con <strong id="finalMoves">0</strong> movimientos.</p>
+              </div>
+              <button id="playAgainBtn" class="button button-primary" type="button">Jugar otra vez</button>
+            </section>
+          </section>
+
+          <aside class="settings-panel" aria-labelledby="settingsTitle">
+            <div class="settings-heading"><span class="small-symbol" aria-hidden="true">⚙</span><div><span class="panel-kicker">PERSONALIZA TU RETO</span><h2 id="settingsTitle">Tu puzzle, tus reglas</h2></div></div>
+
+            <section class="setting-block" aria-labelledby="imageTitle">
+              <div class="setting-heading"><h3 id="imageTitle">01. Elige una imagen</h3><span class="setting-hint">HTML5 FILE API</span></div>
+              <label for="uploadInput" id="dropZone" class="upload-zone">
+                <span class="upload-icon" aria-hidden="true">↑</span>
+                <span><strong>Haz clic o arrastra tu imagen</strong><small>JPG, PNG, WebP… · máximo 10 MB</small></span>
+              </label>
+              <input id="uploadInput" class="visually-hidden" type="file" accept="image/*" aria-describedby="imageInfo" />
+              <p id="imageInfo" class="file-hint">Imagen de ejemplo cargada. Las fotos se procesan en tu navegador.</p>
+              <p id="errorMessage" class="error-message" role="alert" hidden></p>
+            </section>
+
+            <section class="setting-block" aria-labelledby="difficultyTitle">
+              <div class="setting-heading"><h3 id="difficultyTitle">02. Nivel de dificultad</h3><span class="setting-hint">CSS GRID</span></div>
+              <fieldset class="difficulty-options">
+                <legend class="visually-hidden">Selecciona la dificultad</legend>
+                <label class="difficulty-item"><input type="radio" name="difficulty" value="2" /><span><strong>2 × 2</strong><small>Fácil</small></span></label>
+                <label class="difficulty-item"><input type="radio" name="difficulty" value="3" checked /><span><strong>3 × 3</strong><small>Normal</small></span></label>
+                <label class="difficulty-item"><input type="radio" name="difficulty" value="4" /><span><strong>4 × 4</strong><small>Experto</small></span></label>
+              </fieldset>
+              <p class="setting-note">Cambiar de nivel inicia una nueva partida.</p>
+            </section>
+
+            <section class="setting-block" aria-labelledby="referenceTitle">
+              <div class="setting-heading"><h3 id="referenceTitle">03. Imagen de referencia</h3><span class="setting-hint">PISTA VISUAL</span></div>
+              <div class="original-preview"><img id="originalImage" alt="Imagen original que debes reconstruir en el puzzle" src="" /><span class="preview-caption">TU OBJETIVO</span></div>
+              <label class="switch-row" for="showNumbers"><span><strong>Mostrar números en las piezas</strong><small>Una ayuda para orientarte</small></span><span class="toggle"><input id="showNumbers" type="checkbox" checked /><span class="toggle-track" aria-hidden="true"></span></span></label>
+            </section>
+
+            <div class="privacy-note"><span aria-hidden="true">⌁</span><p>Privacidad primero: tus imágenes no salen de este navegador. No necesitas crear una cuenta ni instalar nada.</p></div>
+          </aside>
+        </div>
+
+        <section id="laboratorio" class="lab-section" aria-labelledby="labTitle">
+          <div class="lab-header"><div><span class="eyebrow">LABORATORIO HCI · UNIDAD 9</span><h2 id="labTitle">Del código a la experiencia</h2></div><p>Prueba el juego como desarrollador y como usuario. Observa qué decisiones facilitan la interacción.</p></div>
+          <div class="lab-grid">
+            <article><span class="lab-index">01</span><h3>HTML5</h3><p>Prueba a subir una imagen arrastrándola y con el selector de archivos. ¿Qué sucede si el formato es incorrecto?</p></article>
+            <article><span class="lab-index">02</span><h3>JavaScript</h3><p>Comprueba cuándo empieza el tiempo, qué cuenta como movimiento y cómo se reinician los estados.</p></article>
+            <article><span class="lab-index">03</span><h3>Responsive</h3><p>Reduce el ancho a 390 px. ¿Se puede completar una partida sin desplazamientos horizontales?</p></article>
+            <article><span class="lab-index">04</span><h3>Accesibilidad</h3><p>Resuelve dos intercambios usando Tab, flechas y Enter. ¿Puedes jugar sin utilizar el ratón?</p></article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer"><span>✳ Puzzle UX Lab</span><span>Proyecto docente HCI · eUniv · Unidad 9</span><span>HTML5 · CSS3 · JavaScript</span></footer>
+
+    <dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewTitle">
+      <div class="dialog-heading"><div><span class="panel-kicker">REFERENCIA VISUAL</span><h2 id="previewTitle">Imagen original</h2></div><form method="dialog"><button class="dialog-close" type="submit" aria-label="Cerrar imagen original">×</button></form></div>
+      <img id="largePreview" alt="Imagen completa que debes reconstruir" src="" />
+      <p>Compara la imagen con el tablero y vuelve a jugar. Puedes cerrar con Escape.</p>
+    </dialog>
+  </body>
+</html>
