@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f6fb">
+  <meta name="description" content="TV Lab HCI: práctica didáctica de HTML5, CSS3, JavaScript y YouTube IFrame Player API.">
+  <title>TV Lab · Laboratorio HCI · Unidad 9</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body data-theme="light">
+  <a class="skip-link" href="#television">Saltar a la televisión</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#inicio" aria-label="TV Lab HCI, ir al inicio">
+        <span class="brand-icon" aria-hidden="true">▣</span>
+        <span class="brand-title">TV<span>LAB</span><small>HCI · UNIDAD 09</small></span>
+      </a>
+      <nav class="header-nav" aria-label="Secciones principales">
+        <a href="#laboratorio">Guía de clase</a>
+        <a href="#conceptos">Conceptos</a>
+        <button class="theme-button" id="themeButton" type="button" aria-label="Activar tema oscuro" aria-pressed="false">
+          <span aria-hidden="true" id="themeIcon">☾</span><span id="themeLabel">Modo oscuro</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="intro wrap" aria-labelledby="pageTitle">
+      <div class="intro-copy">
+        <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> APRENDE CON UNA WEB REAL</span>
+        <h1 id="pageTitle">Construye tu propia <span>televisión web.</span></h1>
+        <p>Una práctica en la que HTML5 organiza, CSS3 transforma y JavaScript da vida a los controles. Experimenta con los estados del reproductor y toma decisiones de diseño centradas en el usuario.</p>
+        <div class="tech-pills" aria-label="Tecnologías y conceptos">
+          <span>HTML5 semántico</span><span>CSS3 responsive</span><span>Eventos JavaScript</span><span>API de YouTube</span>
+        </div>
+      </div>
+      <div class="intro-decoration" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><span class="decoration-symbol">▶</span></div>
+    </section>
+
+    <div class="workbench wrap" id="television">
+      <section class="screen-panel" aria-labelledby="tvHeading">
+        <div class="section-heading">
+          <div><span class="section-kicker">01 / EXPERIENCIA</span><h2 id="tvHeading">Tu televisión</h2></div>
+          <span class="status-badge" id="statusBadge"><span class="status-dot" aria-hidden="true"></span><span id="statusText">Sin conectar</span></span>
+        </div>
+
+        <div class="tv-scene" id="tvScene" data-frame="classic">
+          <div class="tv-housing" id="tvHousing">
+            <div class="tv-top-detail" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="tv-screen" aria-label="Área de reproducción de vídeo">
+              <div id="youtubePlayer" class="youtube-slot" aria-label="Reproductor de YouTube"></div>
+              <div id="screenPlaceholder" class="screen-placeholder">
+                <div class="screen-grid" aria-hidden="true"></div>
+                <div class="screen-graphic" aria-hidden="true"><span class="play-disc">▶</span><span class="screen-wave"></span></div>
+                <strong>Tu pantalla está lista</strong>
+                <p>Introduce un enlace y pulsa «Cargar vídeo» para conectar la TV.</p>
+              </div>
+              <div id="screenBusy" class="screen-busy" hidden role="status"><span class="spinner" aria-hidden="true"></span><span>Conectando con el reproductor…</span></div>
+            </div>
+            <div class="tv-lower"><span class="tv-model">TV LAB <span class="model-accent">/</span> EXPERIMENTAL</span><span class="tv-power" aria-hidden="true"></span></div>
+          </div>
+          <div class="tv-stand" aria-hidden="true"></div>
+          <div class="tv-foot" aria-hidden="true"></div>
+        </div>
+
+        <form id="videoForm" class="video-form" novalidate>
+          <label for="videoUrl">Enlace del vídeo de YouTube</label>
+          <div class="url-controls">
+            <input id="videoUrl" name="videoUrl" type="url" inputmode="url" spellcheck="false" autocomplete="off" value="https://www.youtube.com/watch?v=M7lc1UVf-VE" placeholder="Pega aquí un enlace de YouTube" aria-describedby="videoHint videoError">
+            <button class="primary-button" id="loadButton" type="submit"><span aria-hidden="true">↗</span> Cargar vídeo</button>
+          </div>
+          <p class="helper-text" id="videoHint">Acepta enlaces de YouTube, youtu.be, Shorts o un ID de vídeo de 11 caracteres.</p>
+          <p class="error-text" id="videoError" role="alert" hidden></p>
+        </form>
+
+        <div class="privacy-note"><span aria-hidden="true">◈</span><p><strong>Privacidad:</strong> el reproductor externo se conecta con YouTube solo después de que pulses «Cargar vídeo». Algunos vídeos no permiten su reproducción incrustada.</p></div>
+
+        <section class="controller" aria-labelledby="controllerHeading">
+          <div class="controller-header"><div><span class="section-kicker">02 / INTERACCIÓN</span><h3 id="controllerHeading">Mando a distancia</h3></div><span class="keyboard-hint">Espacio: Play/Pausa · M: Silencio · ← →: Saltos</span></div>
+          <div class="transport" role="group" aria-label="Controles de reproducción">
+            <button class="control-button" id="backButton" type="button" disabled aria-label="Retroceder 10 segundos" title="Retroceder 10 segundos"><span aria-hidden="true">↶</span><small>−10 s</small></button>
+            <button class="control-button control-main" id="playButton" type="button" disabled aria-label="Reproducir"><span aria-hidden="true">▶</span><small>Play</small></button>
+            <button class="control-button" id="pauseButton" type="button" disabled aria-label="Pausar"><span aria-hidden="true">Ⅱ</span><small>Pausa</small></button>
+            <button class="control-button" id="stopButton" type="button" disabled aria-label="Detener"><span aria-hidden="true">■</span><small>Stop</small></button>
+            <button class="control-button" id="forwardButton" type="button" disabled aria-label="Avanzar 10 segundos" title="Avanzar 10 segundos"><span aria-hidden="true">↷</span><small>+10 s</small></button>
+          </div>
+          <div class="progress-group">
+            <div class="range-label"><label for="progressSlider">Progreso del vídeo</label><output id="timeOutput" aria-live="off">00:00 / 00:00</output></div>
+            <input type="range" class="range-input" id="progressSlider" min="0" max="1000" step="1" value="0" disabled aria-label="Buscar posición en el vídeo">
+          </div>
+          <div class="audio-group">
+            <button class="secondary-button" id="muteButton" type="button" disabled aria-label="Silenciar vídeo"><span id="muteIcon" aria-hidden="true">◖))</span><span id="muteText">Silenciar</span></button>
+            <div class="volume-slider"><label for="volumeSlider">Volumen</label><input id="volumeSlider" class="range-input" type="range" min="0" max="100" value="65" step="5" disabled aria-label="Volumen"><output id="volumeOutput" for="volumeSlider">65 %</output></div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="lab-sidebar" aria-label="Laboratorio de experimentación">
+        <section class="side-card style-card" aria-labelledby="styleHeading">
+          <div class="card-icon icon-indigo" aria-hidden="true">◩</div>
+          <div class="card-title"><span class="section-kicker">03 / CSS3</span><h2 id="styleHeading">Diseña el televisor</h2></div>
+          <p>Cambia la carcasa. Observa cómo CSS modifica la presentación sin alterar la reproducción.</p>
+          <fieldset class="frame-options" id="frameOptions"><legend>Estilo de televisión</legend>
+            <label><input type="radio" name="tvFrame" value="classic" checked><span class="frame-swatch frame-classic" aria-hidden="true"></span><span>Studio</span></label>
+            <label><input type="radio" name="tvFrame" value="retro"><span class="frame-swatch frame-retro" aria-hidden="true"></span><span>Retro</span></label>
+            <label><input type="radio" name="tvFrame" value="minimal"><span class="frame-swatch frame-minimal" aria-hidden="true"></span><span>Minimal</span></label>
+          </fieldset>
+        </section>
+
+        <section class="side-card diagnostics-card" aria-labelledby="diagnosticsHeading">
+          <div class="card-icon icon-green" aria-hidden="true">⌁</div>
+          <div class="card-title"><span class="section-kicker">04 / JAVASCRIPT</span><h2 id="diagnosticsHeading">¿Qué está pasando?</h2></div>
+          <p>Comprueba cómo las acciones del usuario y los eventos de la API cambian el estado.</p>
+          <dl class="state-grid"><div><dt>API de YouTube</dt><dd id="apiState">Sin cargar</dd></div><div><dt>Reproductor</dt><dd id="playerState">En espera</dd></div><div><dt>Vídeo seleccionado</dt><dd id="currentVideoId">Ninguno</dd></div></dl>
+          <h3 class="event-heading">Registro de eventos <span class="live-dot" aria-hidden="true"></span></h3>
+          <ol id="eventLog" class="event-log" aria-label="Últimos eventos de la aplicación"><li>La aplicación está preparada.</li></ol>
+          <p class="mini-note">Abre las herramientas de desarrollador del navegador y observa la consola mientras pruebas los botones.</p>
+        </section>
+      </aside>
+    </div>
+
+    <section class="lesson wrap" id="laboratorio" aria-labelledby="lessonHeading">
+      <div class="lesson-intro"><span class="section-kicker">ACTIVIDAD INDIVIDUAL · 35 MINUTOS</span><h2 id="lessonHeading">Del código a la experiencia de usuario</h2><p>Una misma aplicación permite practicar estructura, estilos, eventos y decisiones de interacción. Completa los retos y justifica una mejora de HCI.</p></div>
+      <div class="lesson-grid">
+        <article class="lesson-card"><span class="lesson-num">01</span><span class="lesson-time">10 MIN</span><h3>Explora HTML5</h3><p>Localiza <code>header</code>, <code>main</code>, <code>section</code>, <code>form</code>, <code>button</code> y <code>aside</code>. Identifica por qué el vídeo de YouTube necesita un <code>iframe</code>.</p><label class="task-check"><input type="checkbox" data-task="html"> Reto revisado</label></article>
+        <article class="lesson-card"><span class="lesson-num">02</span><span class="lesson-time">10 MIN</span><h3>Experimenta con CSS3</h3><p>Prueba tres estilos de televisión. Inspecciona <code>aspect-ratio</code>, Grid, Flexbox, variables CSS y los estados <code>:focus-visible</code>.</p><label class="task-check"><input type="checkbox" data-task="css"> Reto revisado</label></article>
+        <article class="lesson-card"><span class="lesson-num">03</span><span class="lesson-time">10 MIN</span><h3>Observa JavaScript</h3><p>Carga un vídeo, reproduce, pausa y silencia. Sigue el registro de eventos e identifica cuándo se habilitan los controles.</p><label class="task-check"><input type="checkbox" data-task="js"> Reto revisado</label></article>
+        <article class="lesson-card featured-lesson"><span class="lesson-num">04</span><span class="lesson-time">5 MIN</span><h3>Decide como diseñador HCI</h3><p>Elige una mejora: controles más accesibles, feedback más claro o un modo de visualización alternativo. Explica qué problema resuelve y cómo la probarías.</p><label class="task-check"><input type="checkbox" data-task="hci"> Reto revisado</label></article>
+      </div>
+      <div class="lesson-progress"><div><strong id="challengeCount" aria-live="polite">0 de 4 retos revisados</strong><span>Autoevaluación de la práctica</span></div><progress id="challengeProgress" value="0" max="4" aria-label="Progreso de los cuatro retos" aria-valuetext="0 de 4 retos revisados">0 de 4</progress></div>
+    </section>
+
+    <section class="concepts wrap" id="conceptos" aria-labelledby="conceptsHeading"><div class="concept-heading"><span class="section-kicker">CONCEPTOS CLAVE</span><h2 id="conceptsHeading">Tres tecnologías, una experiencia</h2></div><div class="concept-list"><article><span class="concept-symbol">◇</span><h3>HTML5</h3><p>Da significado a la estructura, a los formularios y a los controles accesibles.</p></article><article><span class="concept-symbol">✳</span><h3>CSS3</h3><p>Construye el televisor, adapta el diseño y comunica estados de interacción.</p></article><article><span class="concept-symbol">⌘</span><h3>JavaScript</h3><p>Responde a eventos, valida enlaces y se comunica con la API externa.</p></article></div></section>
+  </main>
+  <footer class="site-footer"><div class="wrap"><strong>TV LAB <span>HCI</span></strong><span>Proyecto docente · Unidad 9 · eUniv</span><span>HTML5 · CSS3 · JavaScript</span></div></footer>
+</body>
+</html>
